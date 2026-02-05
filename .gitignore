@@ -1,0 +1,12 @@
+# extensions to ignore
+*.o
+*.out
+*.exe
+build/
+.vscode/
+
+# project run names to ignore
+new_test
+pid_test
+new_run
+
