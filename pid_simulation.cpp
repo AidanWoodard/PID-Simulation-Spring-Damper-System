@@ -1,28 +1,45 @@
 #include <iostream>
 #include <fstream>
-using namespace std;
+#include <format>
+//using namespace std;    // this is poor practice, use std:: for clarity, etc.
 
 int main() {
-  // prviously created
-  fstream TestFile("testFile.txt");
-  TestFile << "Hell world.";
+  std::fstream fout;
+  fout.open("test.csv", std::ios::out | std::ios::app);
   
-  // seekg takes (change, origin) such that if our file pointer is at 3, 
-  // File.seekg(-1, fstream::curr) would move the pointer back one char.
-  // note: 'beg' for origin, 'curr' for current pos, and 'end' for end.
-  TestFile.seekg(0, fstream::beg);
-  char contents[4];
-  TestFile.read(contents, 3);
-  contents[3] = '\0';
-  cout << contents << '\n';
+  // redundant, but good practice
+  if (!fout.is_open()) {
+    std::cerr << "ERROR: could not find or open csv file 'test.csv'" << std::endl;
+    return 1;
+  }
 
-  // since we don't move the file pointer, we pick up where we left off.
-  // in this case we start at the second 'l' of Hell world and print 'l w'.
-  char contents2[4];
-  TestFile.read(contents2, 3);
-  contents2[3] = '\0';
-  cout << contents2 << '\n';
+  // add num1 and num2, multiply result by multFactor
+  int num1, num2, multFactor;
+  int totalSum, i;
 
-  TestFile.close();
+  std::cout << "####### Write 3 different sums to add to the .csv #######"
+            << '\n';
+  std::cout << "Enter 2 numbers to add together."
+       << "Then enter one more number to multiply the sum."
+       << std::endl;
+  
+  for (i = 0; i < 3; i++) {
+    std::cout << std::format("Current editing line: {}", i + 1) << '\n';
+    std::cout << "Enter number 1, 2, and the multiplier:" << '\n';
+
+    // save input
+    std::cin >> num1
+              >> num2
+              >> multFactor;
+    totalSum = (num1 + num2) * multFactor;
+
+    // write to .csv
+    fout << num1 << ","
+        << num2 << ","
+        << multFactor << ","
+        << totalSum
+        << '\n';
+    }
+
   return 0;
 } 
