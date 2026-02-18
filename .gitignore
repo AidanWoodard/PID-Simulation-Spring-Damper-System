@@ -5,6 +5,13 @@
 build/
 .vscode/
 
+# python cache
+__pycache__/
+*.pyc
+
+# sim data
+telemetry.csv
+
 # project run names to ignore
 new_test
 pid_test
