@@ -2,7 +2,7 @@
 CXX = g++		# compiler
 CXXFLAGS = -Wall -g	# extra info when running/errors
 TARGET = new_test	# name of run (added in .gitignore)
-SOURCES = pid_simulation.cpp	# file name
+SOURCES = src/main.cpp	# file name
 
 # build rule
 $(TARGET): $(SOURCES)
