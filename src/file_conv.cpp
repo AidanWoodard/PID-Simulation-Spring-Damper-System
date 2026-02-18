@@ -11,8 +11,9 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 #include <fstream>
 #include <format>
 #include <vector>
+#include "file_conv.hpp"
 
-class File_Converter {
+class File_Convert {
     public:
         std::string fileName = "telemetry";
         

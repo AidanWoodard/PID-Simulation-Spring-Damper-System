@@ -5,13 +5,15 @@ enter simulation data into telemetry.csv, which is used by python
 visulization scripts in src/python_viz/.
 */
 
+#include "file_conv.hpp"
+#include "phys_sim.hpp"
 #include <iostream>
-// #include "File_Converter"
 
 int main() {
-    std::cout << "Hell world." << std::endl;
+    double activeForce = 5.0;
 
-    // File_Converter fConv;
+    File_Convert fConv;
+    PhysicsSim physSim(activeForce);
 
     return 0;
 }
