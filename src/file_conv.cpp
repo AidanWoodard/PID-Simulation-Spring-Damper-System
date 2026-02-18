@@ -8,7 +8,15 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 */
 
 #include <iostream>
+#include <fstream>
+#include <format>
+#include <vector>
 
-int main() {
-    return 0;
-}
+class File_Converter {
+    public:
+        std::string fileName = "telemetry";
+        
+        void updateTelemetry(int position) {
+            // write to fileName.csv
+        }
+};

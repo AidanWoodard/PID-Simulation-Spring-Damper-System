@@ -10,7 +10,7 @@ __pycache__/
 *.pyc
 
 # sim data
-telemetry.csv
+data/
 
 # project run names to ignore
 new_test
