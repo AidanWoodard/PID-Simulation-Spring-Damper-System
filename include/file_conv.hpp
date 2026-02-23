@@ -8,7 +8,8 @@ class FileConverter {
                     double appliedF,
                     double currPos);
 
-    void writeToCSV(std::vector<SimDataPoint>);
+    void writeToCSV(std::vector<SimDataPoint>,
+                    std::string fileName);
 
     private:
     std::vector<SimDataPoint> logBuffer;

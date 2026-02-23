@@ -11,10 +11,13 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 #include <vector>
 #include "file_conv.hpp"
 
-FileConverter::FileConverter() {
-    // default constructor
-};
+FileConverter::FileConverter() {};
 
 void FileConverter::recordData(double time, double appliedF, double currPos) {
     logBuffer.push_back({time, appliedF, currPos});
+}
+
+void FileConverter::writeToCSV(std::vector<SimDataPoint>, std::string fileName) {
+    // TODO: write to fileName.csv in format {time, applied force, current position} 
+    // (which is a SimDataPoint as defined in phys_sim.hpp)
 }

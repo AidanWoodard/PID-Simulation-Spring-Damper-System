@@ -4,14 +4,14 @@ point B with an applied weight (constant).
 */
 
 #include <iostream>
+#include <chrono>
+#include <thread>
 #include "../include/phys_sim.hpp"
 #include "../include/PID.hpp"
 
 double PhysicsSim::getPosition() { return currPointPos; }
 
-PhysicsSim::PhysicsSim(PIDCalculator& pidRef) : pid(pidRef) {
-    std::cout << "Created new physics simulation." << '\n';
-}
+PhysicsSim::PhysicsSim(PIDCalculator& pidRef) : pid(pidRef) {}
 
 void PhysicsSim::beginSimulation(double runTime, double dt) {
     currPointPos = 0.0;
@@ -21,6 +21,7 @@ void PhysicsSim::beginSimulation(double runTime, double dt) {
 
     while (elapsedTime < runTime) {
         update(dt);
+        dt = updateDeltaTime(dt);
 
         // safecatch
         if (!simActive) { break; }
@@ -28,11 +29,8 @@ void PhysicsSim::beginSimulation(double runTime, double dt) {
     }
 }
 
-// FIXME: (Displays var from FileConverter through PID)
-void PhysicsSim::test() { pid.sayHello(); }
-
 double PhysicsSim::calculateAccel(double inputForce) {
-    // F = M * A   =>   A = F / M
+    // FIXME    A=F/M is a substitute for now
     return (FORCE_GRAVITY + inputForce) / OBJECT_MASS;
 }
 
@@ -40,4 +38,8 @@ void PhysicsSim::update(double dt) {
     currPointVel += calculateAccel(appliedForce);
     currPointPos += currPointVel;
     std::cout << currPointPos << std::endl;
+}
+
+double PhysicsSim::updateDeltaTime(double dt) {
+    
 }

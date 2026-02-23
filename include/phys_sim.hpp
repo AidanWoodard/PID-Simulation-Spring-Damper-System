@@ -26,6 +26,7 @@ class PhysicsSim {
 
     double calculateAccel(double inputForce);
     void update(double dt);
+    double updateDeltaTime(double dt);
     
     public:
     PhysicsSim(PIDCalculator& pidRef);
