@@ -1,8 +1,17 @@
 #include <iostream>
 #include <fstream>
 #include <format>
+#include "../include/PID.hpp"
 //using namespace std;    // this is poor practice, use std:: for clarity, etc.
 
-int main() {
-    return 0;
-} 
+PIDCalculator::PIDCalculator(double p, double i, double d)
+    : kp(p), ki(i), kd(d) {}
+
+void PIDCalculator::sayHello() {
+    std::cout << "Hell world." << '\n';
+}
+
+void PIDCalculator::resetPID() {
+    // reset the PID by clearing old stored values (not kp, ki, kd)
+    sumError = 0.0;
+}

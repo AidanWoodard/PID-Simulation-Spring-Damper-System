@@ -1,4 +1,15 @@
-class File_Convert {
+#include <vector>
+#include "phys_sim.hpp"
+
+class FileConverter {
     public:
-    File_Convert();
+    FileConverter();
+    void recordData(double time,
+                    double appliedF,
+                    double currPos);
+
+    void writeToCSV(std::vector<SimDataPoint>);
+
+    private:
+    std::vector<SimDataPoint> logBuffer;
 };

@@ -8,16 +8,13 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 */
 
 #include <iostream>
-#include <fstream>
-#include <format>
 #include <vector>
 #include "file_conv.hpp"
 
-class File_Convert {
-    public:
-        std::string fileName = "telemetry";
-        
-        void updateTelemetry(int position) {
-            // write to fileName.csv
-        }
+FileConverter::FileConverter() {
+    // default constructor
 };
+
+void FileConverter::recordData(double time, double appliedF, double currPos) {
+    logBuffer.push_back({time, appliedF, currPos});
+}
