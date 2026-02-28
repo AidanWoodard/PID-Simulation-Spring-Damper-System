@@ -5,7 +5,6 @@ class PIDCalculator {
                 double i,
                 double d);
 
-    void sayHello();
     void resetPID();
 
     private:

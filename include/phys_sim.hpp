@@ -5,9 +5,11 @@ struct SimDataPoint {
     double timeStamp;
     double currAppliedForce;
     double currPointPos;
+    double currPointVel;
 };
 
 class PIDCalculator;
+class FileConverter;
 
 class PhysicsSim {
     private:
@@ -17,24 +19,23 @@ class PhysicsSim {
     bool simActive;
 
     double elapsedTime;
-    double dt;
+    double startSimTime;
 
     PIDCalculator& pid;
+    FileConverter& fileWriter;
 
     static constexpr double FORCE_GRAVITY = -9.81;
     static constexpr double OBJECT_MASS = 5.0;      //kg
 
     double calculateAccel(double inputForce);
-    void update(double dt);
-    double updateDeltaTime(double dt);
+    void update();
     
     public:
-    PhysicsSim(PIDCalculator& pidRef);
+    PhysicsSim(PIDCalculator& pidRef, FileConverter& fileWriter);
     void beginSimulation(double runTime, double elapsTime);
     double getPosition();
-
-    // FIXME
-    void test();
+    double getVelocity();
+    double getSimDur();
 };
 
 #endif

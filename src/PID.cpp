@@ -7,10 +7,6 @@
 PIDCalculator::PIDCalculator(double p, double i, double d)
     : kp(p), ki(i), kd(d) {}
 
-void PIDCalculator::sayHello() {
-    std::cout << "Hell world." << '\n';
-}
-
 void PIDCalculator::resetPID() {
     // reset the PID by clearing old stored values (not kp, ki, kd)
     sumError = 0.0;

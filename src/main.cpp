@@ -9,13 +9,14 @@ visulization scripts in src/python_viz/.
 #include "phys_sim.hpp"
 #include "PID.hpp"
 #include <iostream>
+#include <string>
 
 int main() {
     FileConverter fileConv;
+    fileConv.setTargetFile("../data/telemetry.csv");
     PIDCalculator pidCalc(0.0, 0.0, 0.0);
-    PhysicsSim physSim(pidCalc);
+    PhysicsSim physSim(pidCalc, fileConv);            // references, not copies
 
-    physSim.test();
-
+    // no errors
     return 0;
 }

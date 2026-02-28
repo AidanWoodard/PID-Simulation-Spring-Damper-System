@@ -1,4 +1,5 @@
 #include <vector>
+#include <string>
 #include "phys_sim.hpp"
 
 class FileConverter {
@@ -6,11 +7,12 @@ class FileConverter {
     FileConverter();
     void recordData(double time,
                     double appliedF,
-                    double currPos);
-
-    void writeToCSV(std::vector<SimDataPoint>,
-                    std::string fileName);
+                    double currPos,
+                    double currVel);
+    void saveSimDataToCSV();
+    void setTargetFile(std::string fileName);
 
     private:
     std::vector<SimDataPoint> logBuffer;
+    std::string targetFileName;
 };
