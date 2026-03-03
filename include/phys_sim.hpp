@@ -13,29 +13,25 @@ class FileConverter;
 
 class PhysicsSim {
     private:
-    double currPointPos;
-    double currPointVel;
-    double appliedForce;
-    bool simActive;
+    double currPointPos = 0.0;
+    double currPointVel = 0.0;
 
-    double elapsedTime;
-    double startSimTime;
+    const double fixed_dt = 0.01;   // 10 ms
 
     PIDCalculator& pid;
     FileConverter& fileWriter;
 
-    static constexpr double FORCE_GRAVITY = -9.81;
+    static constexpr double FORCE_GRAVITY = 9.81;
     static constexpr double OBJECT_MASS = 5.0;      //kg
 
     double calculateAccel(double inputForce);
-    void update();
+    void update(double simTime);
     
     public:
     PhysicsSim(PIDCalculator& pidRef, FileConverter& fileWriter);
-    void beginSimulation(double runTime, double elapsTime);
+    void beginSimulation(int maxRuntimeSeconds);
     double getPosition();
     double getVelocity();
-    double getSimDur();
 };
 
 #endif

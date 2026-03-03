@@ -11,3 +11,15 @@ void PIDCalculator::resetPID() {
     // reset the PID by clearing old stored values (not kp, ki, kd)
     sumError = 0.0;
 }
+
+double PIDCalculator::calculateAppliedForce(double pos, double vel) {
+    if (pos < simTargetPos && pos > (simTargetPos * 0.75)) {
+        return 15.0;
+    } else if (pos < simTargetPos) {
+        return 25.0;
+    } else {
+        return 0.0;
+    }
+}
+
+void PIDCalculator::setNewTarget(double pos) { simTargetPos = pos; }

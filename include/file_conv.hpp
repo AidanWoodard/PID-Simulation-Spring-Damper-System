@@ -11,6 +11,8 @@ class FileConverter {
                     double currVel);
     void saveSimDataToCSV();
     void setTargetFile(std::string fileName);
+    void displayFinalPosData();
+    void saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs);
 
     private:
     std::vector<SimDataPoint> logBuffer;

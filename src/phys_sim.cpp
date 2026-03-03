@@ -16,41 +16,53 @@ PhysicsSim::PhysicsSim(PIDCalculator& pidRef, FileConverter& fileRef)
 
 double PhysicsSim::calculateAccel(double inputForce) {
     // FIXME    A=F/M is a substitute for now
-    return (FORCE_GRAVITY + inputForce) / OBJECT_MASS;
+    return (inputForce - FORCE_GRAVITY) / OBJECT_MASS;
 }
 
-void PhysicsSim::update() {
+void PhysicsSim::update(double simTime) {
+    // calculate applied net force
+    double appliedForce = pid.calculateAppliedForce(getPosition(), getVelocity());
+
+    // add to simulation
     currPointVel += calculateAccel(appliedForce);
     currPointPos += currPointVel;
-    fileWriter.recordData(elapsedTime, appliedForce, getPosition(), getVelocity());
+    fileWriter.recordData(simTime, appliedForce, getPosition(), getVelocity());
     // std::cout << currPointPos << std::endl;
 }
 
-void PhysicsSim::beginSimulation(double runTime, double fixed_dt) {
-    currPointPos = 0.0;
-    currPointVel = 0.0;
-    startSimTime = clock();
+void PhysicsSim::beginSimulation(int maxRuntimeSeconds) {
+    const auto startWallTime = std::chrono::steady_clock::now();
+    double simTime = 0.0;
     bool simActive = true;
+    int checkIfExceededDur;
+    const int EXCEEDED_COUNTER_SET = 100;
 
-    while (elapsedTime < runTime) {
-        update();
+    pid.resetPID();
 
-        // safecatch
-        if (!simActive) { break; }
-        else { elapsedTime = clock(); }     // FIXME: this is bad practice and inaccurate :(
+    while (simActive) {
+        update(simTime);
+        simTime += fixed_dt;
+
+        // killswitch
+        if (checkIfExceededDur <= 0) {
+            const auto currWallTime = std::chrono::steady_clock::now();
+            const std::chrono::duration<double> elapsedSimTime{currWallTime - startWallTime};
+            if (elapsedSimTime > std::chrono::duration<double>(maxRuntimeSeconds)) {
+                simActive = false;
+                fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedSimTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedSimTime).count());
+            } else {
+                checkIfExceededDur = EXCEEDED_COUNTER_SET;
+            }
+        } else { checkIfExceededDur--; }
     }
 
     // data stored in FileConverter object as 'logBuffer'
     fileWriter.saveSimDataToCSV();
 
-    std::cout << "########################################" << '\n';
-    std::cout << std::format("Simulation finished: {:.4f}s", getSimDur()) << '\n';
-    std::cout << "########################################" << '\n';
+    std::cout << "#############################################" << '\n';
+    std::cout << "\tSimulation finished" << '\n';
+    std::cout << "#############################################" << '\n';
 }
 
 double PhysicsSim::getPosition() { return currPointPos; }
 double PhysicsSim::getVelocity() { return currPointVel; }
-
-double PhysicsSim::getSimDur() {
-    return elapsedTime - startSimTime;
-}

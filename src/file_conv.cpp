@@ -8,8 +8,9 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 */
 
 #include <iostream>
-#include <vector>
+#include <chrono>
 #include <string>
+#include <format>
 #include "file_conv.hpp"
 
 FileConverter::FileConverter() {};
@@ -25,4 +26,20 @@ void FileConverter::saveSimDataToCSV() {
 
 void FileConverter::setTargetFile(std::string fileName) {
     targetFileName = fileName;
+}
+
+void FileConverter::displayFinalPosData() {
+    std::cout << "\nSIMULATION OUPUT: Position" << '\n';
+    std::cout << "----------------------------\nTime:\t\tPosition:" << '\n';
+
+    for (SimDataPoint dataSnapshot : logBuffer) {
+        std::cout << std::format("{:.4f}\t\t{:.4f}", dataSnapshot.timeStamp, dataSnapshot.currPointPos) << '\n';
+    }
+
+    std::cout << "----------------------------\n(End of simulation)" << '\n';
+}
+
+void FileConverter::saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs) {
+    std::cout << std::format("Simulation duration: {} ns", elapsedTimeNs) << '\n';
+    std::cout << std::format("Simulation duration: {:.6f} sec", elapsedTimeMs) << '\n';
 }
