@@ -8,9 +8,9 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 */
 
 #include <iostream>
-#include <chrono>
 #include <string>
 #include <format>
+#include <fstream>
 #include "file_conv.hpp"
 
 FileConverter::FileConverter() {};
@@ -19,9 +19,31 @@ void FileConverter::recordData(double time, double appliedF, double currPos, dou
     logBuffer.push_back({time, appliedF, currPos, currVel});
 }
 
-void FileConverter::saveSimDataToCSV() {
+void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
     // TODO: write logBuffer to targetFileName.csv in format {time, applied force, current position} 
     // (which is a SimDataPoint as defined in phys_sim.hpp)
+    if (targetFileName == "") {
+        std::cerr << "ERROR: No target file for data named. Did you forget to call FileConverter.setTargetFile('file.csv')?" << '\n';
+    } else {
+        std::fstream TargetFile;
+
+        if (clearFileBeforeEntry) {
+            TargetFile.open(targetFileName, std::ios::out | std::ios::trunc);
+        } else {
+            TargetFile.open(targetFileName, std::ios::out | std::ios::app);
+        }
+
+        for (SimDataPoint dataSnapshot : logBuffer) {
+            TargetFile << 
+                        dataSnapshot.timeStamp << ',' <<
+                        dataSnapshot.currPointPos << ',' <<
+                        dataSnapshot.currPointPos << ',' <<
+                        dataSnapshot.currPointVel << ',';
+            
+        }
+
+        TargetFile.close();
+    }
 }
 
 void FileConverter::setTargetFile(std::string fileName) {
@@ -40,6 +62,7 @@ void FileConverter::displayFinalPosData() {
 }
 
 void FileConverter::saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs) {
+    // FIXME: save as first entry into .csv data
     std::cout << std::format("Simulation duration: {} ns", elapsedTimeNs) << '\n';
     std::cout << std::format("Simulation duration: {:.6f} sec", elapsedTimeMs) << '\n';
 }
