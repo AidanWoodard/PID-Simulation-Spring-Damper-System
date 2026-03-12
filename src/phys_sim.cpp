@@ -56,7 +56,6 @@ void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
                 fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedWallTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
             } else {
                 std::cout << "Simulation not finished, restarting counter..." << '\n';
-                std::cout << std::format("Elapsed real-world time: {}, Maximum time: {:.6f}.", elapsedWallTime, std::chrono::duration<double>(maxRuntimeSeconds).count()) << '\n';
                 checkIfExceededDur = EXCEEDED_COUNTER_SET;
             }
         } else { checkIfExceededDur--; }
