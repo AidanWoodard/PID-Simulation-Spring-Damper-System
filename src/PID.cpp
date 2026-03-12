@@ -13,13 +13,14 @@ void PIDCalculator::resetPID() {
 }
 
 double PIDCalculator::calculateAppliedForce(double pos, double vel) {
-    if (pos < simTargetPos && pos > (simTargetPos * 0.75)) {
-        return 15.0;
-    } else if (pos < simTargetPos) {
-        return 25.0;
-    } else {
-        return 0.0;
-    }
+    // if (pos < simTargetPos && pos > (simTargetPos * 0.75)) {
+    //     return 15.0;
+    // } else if (pos < simTargetPos) {
+    //     return 25.0;
+    // } else {
+    //     return 0.0;
+    // }
+    return 10.0;     // FIXME: temporary const
 }
 
 void PIDCalculator::setNewTarget(double pos) { simTargetPos = pos; }

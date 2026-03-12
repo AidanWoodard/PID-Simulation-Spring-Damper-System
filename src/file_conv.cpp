@@ -38,7 +38,7 @@ void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
                         dataSnapshot.timeStamp << ',' <<
                         dataSnapshot.currPointPos << ',' <<
                         dataSnapshot.currPointPos << ',' <<
-                        dataSnapshot.currPointVel << ',';
+                        dataSnapshot.currPointVel << ",\n";
             
         }
 

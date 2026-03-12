@@ -27,7 +27,6 @@ void PhysicsSim::update(double simTime) {
     currPointVel += calculateAccel(appliedForce);
     currPointPos += currPointVel;
     fileWriter.recordData(simTime, appliedForce, getPosition(), getVelocity());
-    // std::cout << currPointPos << std::endl;
 }
 
 void PhysicsSim::beginSimulation(int maxRuntimeSeconds) {
@@ -43,17 +42,19 @@ void PhysicsSim::beginSimulation(int maxRuntimeSeconds) {
         update(simTime);
         simTime += fixed_dt;
 
-        // killswitch
-        if (checkIfExceededDur <= 0) {
-            const auto currWallTime = std::chrono::steady_clock::now();
-            const std::chrono::duration<double> elapsedSimTime{currWallTime - startWallTime};
-            if (elapsedSimTime > std::chrono::duration<double>(maxRuntimeSeconds)) {
-                simActive = false;
-                fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedSimTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedSimTime).count());
-            } else {
-                checkIfExceededDur = EXCEEDED_COUNTER_SET;
-            }
-        } else { checkIfExceededDur--; }
+        simActive = !(simTime >= maxRuntimeSeconds);    // FIXME: not using wall time, just a bandaid
+
+        // // killswitch
+        // if (checkIfExceededDur <= 0) {
+        //     const auto currWallTime = std::chrono::steady_clock::now();
+        //     const std::chrono::duration<double> elapsedSimTime{currWallTime - startWallTime};
+        //     if (elapsedSimTime > std::chrono::duration<double>(maxRuntimeSeconds)) {
+        //         simActive = false;
+        //         fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedSimTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedSimTime).count());
+        //     } else {
+        //         checkIfExceededDur = EXCEEDED_COUNTER_SET;
+        //     }
+        // } else { checkIfExceededDur--; }
     }
 
     // data stored in FileConverter object as 'logBuffer'

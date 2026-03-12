@@ -16,7 +16,7 @@ class PhysicsSim {
     double currPointPos = 0.0;
     double currPointVel = 0.0;
 
-    const double fixed_dt = 0.01;   // 10 ms
+    const double fixed_dt = 0.01;   // 10 ms, 0.01s
 
     PIDCalculator& pid;
     FileConverter& fileWriter;
