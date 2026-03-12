@@ -29,35 +29,40 @@ void PhysicsSim::update(double simTime) {
     fileWriter.recordData(simTime, appliedForce, getPosition(), getVelocity());
 }
 
-void PhysicsSim::beginSimulation(int maxRuntimeSeconds) {
+void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
     const auto startWallTime = std::chrono::steady_clock::now();
     double simTime = 0.0;
     bool simActive = true;
-    int checkIfExceededDur;
+    int checkIfExceededDur = 0;
     const int EXCEEDED_COUNTER_SET = 100;
 
     pid.resetPID();
 
     while (simActive) {
         update(simTime);
-        simTime += fixed_dt;
+        simTime += FIXED_DT;
 
-        simActive = !(simTime >= maxRuntimeSeconds);    // FIXME: not using wall time, just a bandaid
+        // simulation clock kill switch
+        simActive = !(simTime >= KILL_SWITCH_SIM_TIME);
 
-        // // killswitch
-        // if (checkIfExceededDur <= 0) {
-        //     const auto currWallTime = std::chrono::steady_clock::now();
-        //     const std::chrono::duration<double> elapsedSimTime{currWallTime - startWallTime};
-        //     if (elapsedSimTime > std::chrono::duration<double>(maxRuntimeSeconds)) {
-        //         simActive = false;
-        //         fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedSimTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedSimTime).count());
-        //     } else {
-        //         checkIfExceededDur = EXCEEDED_COUNTER_SET;
-        //     }
-        // } else { checkIfExceededDur--; }
+        // wall clock kill switch
+        if (checkIfExceededDur <= 0) {
+            const auto currWallTime = std::chrono::steady_clock::now();
+            const std::chrono::duration<double> elapsedWallTime{currWallTime - startWallTime};
+            if (std::chrono::duration<double>(maxRuntimeSeconds).count() > 0 && 
+                elapsedWallTime > std::chrono::duration<double>(maxRuntimeSeconds)) {
+                simActive = false;
+                std::cout << std::format("Exiting simulation at {:.6f} elapsed time", std::chrono::duration<double>(maxRuntimeSeconds).count()) << '\n';
+                fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedWallTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
+            } else {
+                std::cout << "Simulation not finished, restarting counter..." << '\n';
+                std::cout << std::format("Elapsed real-world time: {}, Maximum time: {:.6f}.", elapsedWallTime, std::chrono::duration<double>(maxRuntimeSeconds).count()) << '\n';
+                checkIfExceededDur = EXCEEDED_COUNTER_SET;
+            }
+        } else { checkIfExceededDur--; }
     }
 
-    // data stored in FileConverter object as 'logBuffer'
+    // data is stored in FileConverter object as 'logBuffer'
     fileWriter.saveSimDataToCSV();
 
     std::cout << "#############################################" << '\n';

@@ -12,12 +12,12 @@ visulization scripts in src/python_viz/.
 #include <string>
 
 int main() {
-    int maxSimulationSeconds = 0.5;     // max wall time
+    double maxSimulationSeconds = 0.5;     // max wall time
     double targetPosition = 10.0;
     double kp = 0.0;
     double ki = 0.0;
     double kd = 0.0;
-    
+
     FileConverter fileConv;
     fileConv.setTargetFile("../data/telemetry.csv");
 

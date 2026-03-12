@@ -16,7 +16,8 @@ class PhysicsSim {
     double currPointPos = 0.0;
     double currPointVel = 0.0;
 
-    const double fixed_dt = 0.01;   // 10 ms, 0.01s
+    const double FIXED_DT = 0.01;   // 10 ms, 0.01s
+    const double KILL_SWITCH_SIM_TIME = 60.0;   // sim time, not wall time
 
     PIDCalculator& pid;
     FileConverter& fileWriter;
@@ -29,7 +30,7 @@ class PhysicsSim {
     
     public:
     PhysicsSim(PIDCalculator& pidRef, FileConverter& fileWriter);
-    void beginSimulation(int maxRuntimeSeconds);
+    void beginSimulation(double maxRuntimeSeconds);
     double getPosition();
     double getVelocity();
 };
