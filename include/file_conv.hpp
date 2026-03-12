@@ -1,3 +1,6 @@
+#ifndef FILE_CONV_HPP
+#define FILE_CONV_HPP
+
 #include <vector>
 #include <string>
 #include "phys_sim.hpp"
@@ -19,3 +22,5 @@ class FileConverter {
     std::vector<SimDataPoint> logBuffer;
     std::string targetFileName;
 };
+
+#endif

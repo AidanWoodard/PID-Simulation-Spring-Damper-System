@@ -1,3 +1,6 @@
+#ifndef PID_HPP
+#define PID_HPP
+
 class PIDCalculator {
     public:
     // the "P, I, D" values
@@ -20,3 +23,5 @@ class PIDCalculator {
     // refactor later. Temporary naming
     double sumError;
 };
+
+#endif

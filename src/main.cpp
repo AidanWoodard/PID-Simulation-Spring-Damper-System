@@ -5,9 +5,9 @@ enter simulation data into telemetry.csv, which is used by python
 visulization scripts in src/python_viz/.
 */
 
-#include "file_conv.hpp"
-#include "phys_sim.hpp"
-#include "PID.hpp"
+#include "../include/file_conv.hpp"
+#include "../include/phys_sim.hpp"
+#include "../include/PID.hpp"
 #include <iostream>
 #include <string>
 
