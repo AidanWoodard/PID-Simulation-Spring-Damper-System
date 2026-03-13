@@ -14,7 +14,7 @@ void PIDCalculator::resetPID() {
 
 double PIDCalculator::calculateAppliedForce(double pos, double vel) {
     // FIXME: add force barely greater than gravity if not yet at position (testing purposes)
-    if (pos < simTargetPos) { return 10.0; }
+    if (pos < simTargetPos) { return 12.0; }
     else { return 0.0; }
 }
 

@@ -43,10 +43,14 @@ void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
         simTime += FIXED_DT;
 
         // simulation clock kill switch
-        simActive = !(simTime >= KILL_SWITCH_SIM_TIME);
+        if (simTime >= KILL_SWITCH_SIM_TIME) {
+            // FIXME: not saving final sim time
+            //fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedWallTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
+            simActive = false;
+        }
 
         // wall clock kill switch
-        if (checkIfExceededDur <= 0) {
+        if (simActive && checkIfExceededDur <= 0) {
             const auto currWallTime = std::chrono::steady_clock::now();
             const std::chrono::duration<double> elapsedWallTime{currWallTime - startWallTime};
             if (std::chrono::duration<double>(maxRuntimeSeconds).count() > 0 && 
@@ -55,7 +59,7 @@ void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
                 std::cout << std::format("Exiting simulation at {:.6f} elapsed time", std::chrono::duration<double>(maxRuntimeSeconds).count()) << '\n';
                 fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedWallTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
             } else {
-                std::cout << "Simulation not finished, restarting counter..." << '\n';
+                std::cout << std::format("Simulation not finished at {}, restarting counter...", elapsedWallTime) << '\n';
                 checkIfExceededDur = EXCEEDED_COUNTER_SET;
             }
         } else { checkIfExceededDur--; }

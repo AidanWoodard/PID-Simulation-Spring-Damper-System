@@ -1,6 +1,8 @@
 #ifndef PHYS_SIM_HPP
 #define PHYS_SIM_HPP
 
+#include <chrono>
+
 struct SimDataPoint {
     double timeStamp;
     double currAppliedForce;
@@ -17,7 +19,7 @@ class PhysicsSim {
     double currPointVel = 0.0;
 
     const double FIXED_DT = 0.01;   // 10 ms, 0.01s
-    const double KILL_SWITCH_SIM_TIME = 60.0;   // sim time, not wall time
+    const double KILL_SWITCH_SIM_TIME = 1000.0;   // sim time, not wall time
 
     PIDCalculator& pid;
     FileConverter& fileWriter;
@@ -27,6 +29,7 @@ class PhysicsSim {
 
     double calculateAccel(double inputForce);
     void update(double simTime);
+    std::chrono::duration<double> getElapsedTime();
     
     public:
     PhysicsSim(PIDCalculator& pidRef, FileConverter& fileWriter);

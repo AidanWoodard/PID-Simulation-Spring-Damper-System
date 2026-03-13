@@ -12,7 +12,7 @@ visulization scripts in src/python_viz/.
 #include <string>
 
 int main() {
-    double maxSimulationSeconds = 0.5;     // max wall time
+    double maxSimulationSeconds = 0.8;     // max wall time
     double targetPosition = 10.0;
     double kp = 0.0;
     double ki = 0.0;
@@ -27,7 +27,7 @@ int main() {
     PhysicsSim physSim(pidCalc, fileConv);            // references, not copies
 
     physSim.beginSimulation(maxSimulationSeconds);
-    fileConv.displayFinalPosData();
+    //fileConv.displayFinalPosData();
 
     // no errors
     return 0;

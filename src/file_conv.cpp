@@ -36,7 +36,7 @@ void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
         for (SimDataPoint dataSnapshot : logBuffer) {
             TargetFile << 
                         dataSnapshot.timeStamp << ',' <<
-                        dataSnapshot.currPointPos << ',' <<
+                        dataSnapshot.currAppliedForce << ',' <<
                         dataSnapshot.currPointPos << ',' <<
                         dataSnapshot.currPointVel << ",\n";
             
@@ -64,5 +64,5 @@ void FileConverter::displayFinalPosData() {
 void FileConverter::saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs) {
     // FIXME: save as first entry into .csv data
     std::cout << std::format("Simulation duration: {} ns", elapsedTimeNs) << '\n';
-    std::cout << std::format("Simulation duration: {:.6f} sec", elapsedTimeMs) << '\n';
+    std::cout << std::format("Simulation duration: {:.1f} ms", elapsedTimeMs) << '\n';
 }
