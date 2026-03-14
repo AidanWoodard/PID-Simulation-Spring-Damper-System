@@ -34,7 +34,6 @@ void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
     double simTime = 0.0;
     bool simActive = true;
     int checkIfExceededDur = 0;
-    const int EXCEEDED_COUNTER_SET = 100;
 
     pid.resetPID();
 
@@ -60,7 +59,7 @@ void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
                 fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedWallTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
             } else {
                 std::cout << std::format("Simulation not finished at {}, restarting counter...", elapsedWallTime) << '\n';
-                checkIfExceededDur = EXCEEDED_COUNTER_SET;
+                checkIfExceededDur = TICKS_PER_KILL_SWITCH_CHECK;
             }
         } else { checkIfExceededDur--; }
     }

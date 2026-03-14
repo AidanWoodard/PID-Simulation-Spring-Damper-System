@@ -19,7 +19,8 @@ class PhysicsSim {
     double currPointVel = 0.0;
 
     const double FIXED_DT = 0.01;   // 10 ms, 0.01s
-    const double KILL_SWITCH_SIM_TIME = 1000.0;   // sim time, not wall time
+    const double KILL_SWITCH_SIM_TIME = 2000.0;   // sim time, not wall time
+    const int TICKS_PER_KILL_SWITCH_CHECK = 200;
 
     PIDCalculator& pid;
     FileConverter& fileWriter;
