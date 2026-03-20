@@ -5,6 +5,8 @@ a Position vs. Time graph, and initial paramaters of the simulation will be show
 """
 
 import file_reader
+import matplotlib.pyplot as plt
+import numpy as np
 
 class DataVisualizer:
     def __init__(self, window_width_pixels:int, window_height_pixels:int, animated:bool=False):
