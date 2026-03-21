@@ -13,9 +13,12 @@ class DataVisualizer:
         self.WINDOW_WIDTH = window_width_pixels
         self.WINDOW_HEIGHT = window_height_pixels
 
-    def generateGraph(self):
+    def generateGraph(self, f_reader:file_reader.FileReader):
         # create a graph and show data
-        pass
+        f_reader.openFile(f_reader.FILE_PATH)
+        fig, ax = plt.subplots()
+        ax.plot(f_reader.parsePositionData())
+        plt.show()
 
     def _createWindow(self):
         # create a new window, look at consts

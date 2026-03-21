@@ -8,8 +8,8 @@ import numpy as np
 
 class FileReader:
     def __init__(self):
-        self.FILE_PATH = "~/data/telemetry.csv"
-        self.data_file
+        self.FILE_PATH = "../../data/telemetry.csv"
+        self.data_file = None
         self.file_line_count : int
         self.openFile
 
@@ -33,21 +33,23 @@ class FileReader:
         if self.data_file:
             self.data_file.close()
         else:
-            print("\nERROR OCURRED: File was never found or opnened.")
+            print("\nERROR OCURRED: File was never found or opened.")
 
-    def parsePositionData(self):
-        # pos versus delta time
-        posData = np.array([[], []])
+    def parsePositionData(self) -> list:
+        return [1, 2, 3, 4], [1, 2, 3, 4]
+    # def parsePositionData(self) -> np.array:
+    #     # pos versus delta time
+    #     posData = np.array([[], []])
 
-        for i in range(self.file_line_count):
-            new_data_pt = self._readLine(self.data_file, i)
-            # TODO: return two 1d arrays to posData (and refactor its definition)
+    #     for i in range(self.file_line_count):
+    #         new_data_pt = self._readLine(self.data_file, i)
+    #         # TODO: add data to posData and return
 
-    def parseVelocityData(self):
+    def parseVelocityData(self) -> np.array:
         # vel versus dt
         pass
 
-    def parseAppliedForceData(self):
+    def parseAppliedForceData(self) -> np.array:
         # applied F versus dt
         pass
 
@@ -55,7 +57,7 @@ class FileReader:
         # handle closing the file (little logic)
         pass
 
-    def _readLine(self, open_file, line_num):
+    def _readLine(self, open_file, line_num) -> np.array:
         # return formatted data from current line ('line_num')
         pass
 
