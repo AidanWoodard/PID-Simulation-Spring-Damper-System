@@ -13,7 +13,7 @@ WINDOW_HEIGHT_PX: final = 800
 WINDOW_WIDTH_PX: final = 1200
 
 if __name__ == "__main__":
-    data_vizualizer = dv.DataVisualizer(WINDOW_WIDTH_PX, WINDOW_HEIGHT_PX) 
     file_reader = fr.FileReader()
+    data_vizualizer = dv.DataVisualizer(file_reader) 
 
-    data_vizualizer.generateGraph(file_reader)
+    data_vizualizer.generateGraph()

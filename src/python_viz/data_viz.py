@@ -9,20 +9,22 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 class DataVisualizer:
-    def __init__(self, window_width_pixels:int, window_height_pixels:int, animated:bool=False):
-        self.WINDOW_WIDTH = window_width_pixels
-        self.WINDOW_HEIGHT = window_height_pixels
+    def __init__(self, file_reader:file_reader, animated:bool=False):
+        self.file_reader = file_reader
 
-    def generateGraph(self, f_reader:file_reader.FileReader):
+    def generateGraph(self):
         # create a graph and show data
-        f_reader.openFile(f_reader.FILE_PATH)
-        fig, ax = plt.subplots()
-        ax.plot(f_reader.parsePositionData())
+        self.file_reader.openFile(self.file_reader.FILE_PATH)
+        fig, ax = self._createWindow(show_pos=True)
+        ax.plot(self.file_reader.parsePositionData(), label="Position")
         plt.show()
 
-    def _createWindow(self):
+    def _createWindow(self, show_pos=False, show_vel=False, show_applied_force=False) -> list:
         # create a new window, look at consts
-        pass
+        fig, ax = plt.subplots()
+        ax.xaxis.set_label_text("Time dt (Seconds)")
+        ax.yaxis.set_label_text("Simulated Object Transform")
+        return fig, ax
 
     def _drawDataPoint(self):
         # plot a pt

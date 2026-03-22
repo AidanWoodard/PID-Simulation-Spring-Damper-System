@@ -8,7 +8,7 @@ import numpy as np
 
 class FileReader:
     def __init__(self):
-        self.FILE_PATH = "../../data/telemetry.csv"
+        self.FILE_PATH = "../../data/test.csv"
         self.data_file = None
         self.file_line_count : int
         self.openFile
