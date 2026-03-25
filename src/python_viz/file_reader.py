@@ -12,14 +12,14 @@ class FileReader:
         self.data_file = None
         self.file_line_count : int
         self.openFile
+        self.BUFFER_LINES_COUNT = 3
 
     def openFile(self, file_path):
         # find and open the file, use safe catches if file misplaced
         try:
             self.data_file = open(file_path, mode='r')
             # https://stackoverflow.com/questions/845058/how-to-get-the-line-count-of-a-large-file-cheaply-in-python
-            # People are clever
-            self.file_line_count = sum(1 for _ in self.data_file)
+            self.file_line_count = sum(1 for _ in self.data_file) - self.BUFFER_LINES_COUNT
 
         except FileNotFoundError as e:
             print("\nSIMULATION DATA FILE COULD NOT BE FOUND")
@@ -36,7 +36,7 @@ class FileReader:
             print("\nERROR OCURRED: File was never found or opened.")
 
     def parsePositionData(self) -> list:
-        return [1, 2, 3, 4], [1, 2, 3, 4]
+        return np.ndarray(shape=(2,), dtype=int)
     # def parsePositionData(self) -> np.array:
     #     # pos versus delta time
     #     posData = np.array([[], []])
@@ -47,6 +47,7 @@ class FileReader:
 
     def parseVelocityData(self) -> np.array:
         # vel versus dt
+        return [.1, .2, .3, .4], [.4, .3, .2, .1]   
         pass
 
     def parseAppliedForceData(self) -> np.array:

@@ -9,11 +9,8 @@ from typing import final
 
 import data_viz as dv, file_reader as fr
 
-WINDOW_HEIGHT_PX: final = 800
-WINDOW_WIDTH_PX: final = 1200
-
 if __name__ == "__main__":
     file_reader = fr.FileReader()
     data_vizualizer = dv.DataVisualizer(file_reader) 
 
-    data_vizualizer.generateGraph()
+    data_vizualizer.generateGraph(show_pos=True, show_vel=True)
