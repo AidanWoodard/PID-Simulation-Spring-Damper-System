@@ -13,9 +13,10 @@ void PIDCalculator::resetPID() {
 }
 
 double PIDCalculator::calculateAppliedForce(double pos, double vel) {
-    // FIXME: add force barely greater than gravity if not yet at position (testing purposes)
-    if (pos < simTargetPos) { return 11.0; }
-    else { return 0.0; }
+    if (&simTargetPos != nullptr) {
+        return kp * (simTargetPos - pos);
+    } 
+    else { throw std::invalid_argument("ERROR: No simulation target position for 'simTargetPos' set in PID controller."); }
 }
 
 void PIDCalculator::setNewTarget(double pos) { simTargetPos = pos; }

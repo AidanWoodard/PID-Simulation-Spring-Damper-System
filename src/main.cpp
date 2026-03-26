@@ -5,21 +5,21 @@ enter simulation data into telemetry.csv, which is used by python
 visulization scripts in src/python_viz/.
 */
 
-#include "../include/file_conv.hpp"
+#include "../include/file_conv.hpp"         // this if poor practice, fix when polishing project
 #include "../include/phys_sim.hpp"
 #include "../include/PID.hpp"
 #include <iostream>
 #include <string>
 
 int main() {
-    double maxSimulationSeconds = 0.8;     // max wall time
-    double targetPosition = 10.0;
-    double kp = 0.0;
-    double ki = 0.0;
-    double kd = 0.0;
+    double maxSimulationSeconds = 0.8;      // max wall time
+    double targetPosition = 10.0;           // FIXME: add to sim_config.json
+    double kp = 1.5;                        // FIXME: add to sim_config.json
+    double ki = 0.0;                        // FIXME: add to sim_config.json
+    double kd = 0.0;                        // FIXME: add to sim_config.json
 
     FileConverter fileConv;
-    fileConv.setTargetFile("../data/telemetry.csv");
+    fileConv.setTargetFile("../data/telemetry.csv");    // FIXME: add file path to sim_config.json
 
     PIDCalculator pidCalc(kp, ki, kd);
     pidCalc.setNewTarget(targetPosition);
