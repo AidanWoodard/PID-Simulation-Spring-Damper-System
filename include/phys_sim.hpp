@@ -19,14 +19,14 @@ class PhysicsSim {
     double currPointVel = 0.0;
 
     const double FIXED_DT = 0.01;   // 10 ms, 0.01s
-    const double KILL_SWITCH_SIM_TIME = 20.0;   // sim time, not wall time
+    const double KILL_SWITCH_SIM_TIME = 200.0;   // sim time, not wall time
     const int TICKS_PER_KILL_SWITCH_CHECK = 200;
 
     PIDCalculator& pid;
     FileConverter& fileWriter;
 
-    static constexpr double FORCE_GRAVITY = 9.81;
-    static constexpr double OBJECT_MASS = 5.0;      //kg
+    static constexpr double OBJECT_MASS = 1.0;      //kg
+    static constexpr double FORCE_GRAVITY = 9.81 * OBJECT_MASS;
 
     double calculateAccel(double inputForce);
     void update(double simTime);

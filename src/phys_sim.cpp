@@ -15,7 +15,6 @@ PhysicsSim::PhysicsSim(PIDCalculator& pidRef, FileConverter& fileRef)
             : pid(pidRef), fileWriter(fileRef) {}
 
 double PhysicsSim::calculateAccel(double inputForce) {
-    // FIXME    A=F/M is a substitute for now
     return (inputForce - FORCE_GRAVITY) / OBJECT_MASS;
 }
 
@@ -23,9 +22,10 @@ void PhysicsSim::update(double simTime) {
     // calculate applied net force
     double appliedForce = pid.calculateAppliedForce(getPosition(), getVelocity());
 
-    // add to simulation
-    currPointVel += calculateAccel(appliedForce);
-    currPointPos += currPointVel;
+    // new v = v + a * dt
+    // new p = p + v * dt
+    currPointVel += calculateAccel(appliedForce) * FIXED_DT;
+    currPointPos += currPointVel * FIXED_DT;
     fileWriter.recordData(simTime, appliedForce, getPosition(), getVelocity());
 }
 
