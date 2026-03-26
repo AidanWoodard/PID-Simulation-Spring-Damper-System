@@ -8,21 +8,27 @@ visulization scripts in src/python_viz/.
 #include "../include/file_conv.hpp"         // this if poor practice, fix when polishing project
 #include "../include/phys_sim.hpp"
 #include "../include/PID.hpp"
+#include "../include/sim_config.hpp"
+#include <json.hpp>
 #include <iostream>
-#include <string>
+#include <fstream>
 
 int main() {
-    double maxSimulationSeconds = 0.8;      // max wall time
-    double targetPosition = 10.0;           // FIXME: add to sim_config.json
-    double kp = 10.0;                        // FIXME: add to sim_config.json
-    double ki = 0.5;                        // FIXME: add to sim_config.json
-    double kd = 7.0;                        // FIXME: add to sim_config.json
+    // Before anything else, load in our essential config data for simulation
+    std::ifstream f("../config/sim_config.json");
+    nlohmann::json config_data;
+    f >> config_data;
 
+    AppState::config = SimConfig::from_json(config_data);
     FileConverter fileConv;
     fileConv.setTargetFile("../data/telemetry.csv");    // FIXME: add file path to sim_config.json
 
-    PIDCalculator pidCalc(kp, ki, kd);
-    pidCalc.setNewTarget(targetPosition);
+    double maxSimulationSeconds = 0.8;      // FIXME: add to sim_config.json
+
+    PIDCalculator pidCalc(AppState::config.kp, 
+                            AppState::config.ki, 
+                            AppState::config.kd);
+    pidCalc.setNewTarget(AppState::config.targetPos);
 
     PhysicsSim physSim(pidCalc, fileConv);            // references, not copies
 

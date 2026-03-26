@@ -7,27 +7,30 @@ point B with an applied weight (constant).
 #include <chrono>
 #include <thread>
 #include <format>
+#include <fstream>
 #include "../include/phys_sim.hpp"
 #include "../include/PID.hpp"
 #include "../include/file_conv.hpp"
+#include "../include/sim_config.hpp"
 
 PhysicsSim::PhysicsSim(PIDCalculator& pidRef, FileConverter& fileRef) 
-            : pid(pidRef), fileWriter(fileRef) {}
+            : pid(pidRef), 
+            fileWriter(fileRef) {}
 
 double PhysicsSim::calculateAccel(double inputForce) {
-    return (inputForce - FORCE_GRAVITY) / OBJECT_MASS;
+    return (inputForce - GRAV_FORCE) / OBJECT_MASS;
 }
 
 void PhysicsSim::update(double simTime) {
     // calculate applied net force
     double appliedForce = pid.calculateAppliedForce(getPosition(), getVelocity(), FIXED_DT);
+    currPointVel += calculateAccel(appliedForce) * FIXED_DT;                                    // new v = v + a * dt
+    currPointPos += currPointVel * FIXED_DT;                                                    // new p = p + v * dt
 
-    // new v = v + a * dt
-    // new p = p + v * dt
-    currPointVel += calculateAccel(appliedForce) * FIXED_DT;
-    currPointPos += currPointVel * FIXED_DT;
     fileWriter.recordData(simTime, appliedForce, getPosition(), getVelocity());
 }
+
+std::chrono::duration<double> PhysicsSim::getElapsedTime() {}   //FIXME   
 
 void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
     const auto startWallTime = std::chrono::steady_clock::now();

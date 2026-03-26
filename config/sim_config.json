@@ -1,0 +1,19 @@
+{
+    "simulation": {
+        "gravity_accel": 9.81,
+        "dt": 0.01
+    },
+    "physical_props": {
+        "mass_kg": 5,
+        "start_pos": 0.0,
+        "target_post": 10.0
+    },
+    "pid_gains": {
+        "kp": 20.0,
+        "ki": 3.0,
+        "kd": 14.0
+    },
+    "data_handling": {
+        "record_sim_duration": true
+    }
+}
