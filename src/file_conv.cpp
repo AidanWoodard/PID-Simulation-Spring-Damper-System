@@ -26,22 +26,19 @@ void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
         std::cerr << "ERROR: No target file for data named. Did you forget to call FileConverter.setTargetFile('file.csv')?" << '\n';
     } else {
         std::fstream TargetFile;
-
         if (clearFileBeforeEntry) {
             TargetFile.open(targetFileName, std::ios::out | std::ios::trunc);
         } else {
             TargetFile.open(targetFileName, std::ios::out | std::ios::app);
         }
-
+        TargetFile << "Time,Force,Position,Velocity" << '\n';
         for (SimDataPoint dataSnapshot : logBuffer) {
             TargetFile << 
                         dataSnapshot.timeStamp << ',' <<
                         dataSnapshot.currAppliedForce << ',' <<
                         dataSnapshot.currPointPos << ',' <<
-                        dataSnapshot.currPointVel << ",\n";
-            
+                        dataSnapshot.currPointVel << '\n';
         }
-
         TargetFile.close();
     }
 }

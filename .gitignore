@@ -9,6 +9,7 @@ build/
 # python cache
 __pycache__/
 *.pyc
+scratch.py
 
 # sim data
 data/

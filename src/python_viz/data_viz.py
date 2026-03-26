@@ -4,12 +4,12 @@ MatPlotLib python library. The data, formatted with file_reader.py, will be disp
 a Position vs. Time graph, and initial paramaters of the simulation will be shown, too.
 """
 
-import file_reader
+import file_reader as fr
 import matplotlib.pyplot as plt
-import numpy as np
+import pandas as pd
 
 class DataVisualizer:
-    def __init__(self, file_reader:file_reader, animated:bool=False):
+    def __init__(self, file_reader:fr, animated:bool=False):
         self.file_reader = file_reader
         self.PLOT_TITLE = "1 Dimension PID Simulated Control"
         self.ANIMATED = animated
@@ -20,12 +20,22 @@ class DataVisualizer:
 
     def generateGraph(self, show_pos=False, show_vel=False, show_applied_force=False):
         # create a graph and show data
-        self.file_reader.openFile(self.file_reader.FILE_PATH)
-        # TODO: parse header data and display (ie PID params, dt value)
+        self.file_reader.openDataFile(self.file_reader.FILE_PATH)
+        parsed_sim_data = self.file_reader.parseSimData()
         fig, ax = self._createWindow(show_pos, show_vel, show_applied_force)
-        if show_pos: ax.plot(self.file_reader.parsePositionData(), label="Position")
-        if show_vel: ax.plot(self.file_reader.parseVelocityData(), label="Velocity")
-        if show_applied_force: ax.plot(self.file_reader.parseAppliedForceData(), label="Force")
+        if show_pos: ax.plot(
+                            parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
+                            parsed_sim_data[self.file_reader.POSITION_DATA_HEADER], 
+                            label=self.file_reader.POSITION_DATA_HEADER)
+        if show_vel: ax.plot(
+                            parsed_sim_data[self.file_reader.TIME_DATA_HEADER],
+                            parsed_sim_data[self.file_reader.VELOCITY_DATA_HEADER], 
+                            label=self.file_reader.VELOCITY_DATA_HEADER)
+        if show_applied_force: ax.plot(
+                            parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
+                            parsed_sim_data[self.file_reader.FORCE_DATA_HEADER], 
+                            label=self.file_reader.FORCE_DATA_HEADER)
+        ax.legend()
         plt.show()
 
     def _createWindow(self, show_pos=False, show_vel=False, show_applied_force=False):
@@ -36,7 +46,6 @@ class DataVisualizer:
         fig, ax = plt.subplots()
         ax.xaxis.set_label_text("Time dt (Seconds)")
         ax.set_title(self.PLOT_TITLE)
-
         return fig, ax
 
     def setAnimationTime(self, duration_ms:int):
