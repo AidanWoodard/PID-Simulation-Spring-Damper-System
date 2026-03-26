@@ -12,9 +12,13 @@ void PIDCalculator::resetPID() {
     sumError = 0.0;
 }
 
-double PIDCalculator::calculateAppliedForce(double pos, double vel) {
+double PIDCalculator::calculateAppliedForce(double pos, double vel, double dt) {
     if (&simTargetPos != nullptr) {
-        return kp * (simTargetPos - pos);
+        double p = kp * (simTargetPos - pos);       // P = k * error
+        double i = ki * sumError;                   // I = k * error accumulation
+        double d = kd * vel;                        // D = k * dp/dt
+        sumError += (simTargetPos - pos) * dt;      // update error accumulation
+        return (p+i-d);                             // P + I - D (D component is a braking force)
     } 
     else { throw std::invalid_argument("ERROR: No simulation target position for 'simTargetPos' set in PID controller."); }
 }

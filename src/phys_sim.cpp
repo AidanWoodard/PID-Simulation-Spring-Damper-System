@@ -20,7 +20,7 @@ double PhysicsSim::calculateAccel(double inputForce) {
 
 void PhysicsSim::update(double simTime) {
     // calculate applied net force
-    double appliedForce = pid.calculateAppliedForce(getPosition(), getVelocity());
+    double appliedForce = pid.calculateAppliedForce(getPosition(), getVelocity(), FIXED_DT);
 
     // new v = v + a * dt
     // new p = p + v * dt

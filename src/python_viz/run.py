@@ -13,4 +13,4 @@ if __name__ == "__main__":
     file_reader = fr.FileReader()
     data_vizualizer = dv.DataVisualizer(file_reader) 
 
-    data_vizualizer.generateGraph(show_pos=True)
+    data_vizualizer.generateGraph(show_vel=True, show_pos=True)

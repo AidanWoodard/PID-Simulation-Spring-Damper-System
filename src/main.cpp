@@ -14,9 +14,9 @@ visulization scripts in src/python_viz/.
 int main() {
     double maxSimulationSeconds = 0.8;      // max wall time
     double targetPosition = 10.0;           // FIXME: add to sim_config.json
-    double kp = 1.5;                        // FIXME: add to sim_config.json
-    double ki = 0.0;                        // FIXME: add to sim_config.json
-    double kd = 0.0;                        // FIXME: add to sim_config.json
+    double kp = 10.0;                        // FIXME: add to sim_config.json
+    double ki = 0.5;                        // FIXME: add to sim_config.json
+    double kd = 7.0;                        // FIXME: add to sim_config.json
 
     FileConverter fileConv;
     fileConv.setTargetFile("../data/telemetry.csv");    // FIXME: add file path to sim_config.json

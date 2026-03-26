@@ -10,7 +10,8 @@ class PIDCalculator {
 
     void resetPID();
     double calculateAppliedForce(double pos,
-                                double vel);
+                                double vel,
+                                double dt);
 
     void setNewTarget(double pos);
 
