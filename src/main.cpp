@@ -15,11 +15,11 @@ visulization scripts in src/python_viz/.
 
 int main() {
     // Before anything else, load in our essential config data for simulation
-    std::ifstream f("../config/sim_config.json");
+    std::ifstream f("../config/examples/sharp_pid_config.json");
     nlohmann::json config_data;
     f >> config_data;
-
     AppState::config = SimConfig::from_json(config_data);
+
     FileConverter fileConv;
     fileConv.setTargetFile("../data/telemetry.csv");    // FIXME: add file path to sim_config.json
 
