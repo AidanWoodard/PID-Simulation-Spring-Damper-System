@@ -11,8 +11,8 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 #include <string>
 #include <format>
 #include <fstream>
-#include "../include/file_conv.hpp"
-#include "../include/sim_config.hpp"
+#include "file_conv.hpp"
+#include "sim_config.hpp"
 
 FileConverter::FileConverter() {};
 

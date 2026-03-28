@@ -5,7 +5,6 @@ project(PID_Simulation)
 # make sure we're using the most up to date version
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # prepare with its own library
@@ -25,6 +24,7 @@ target_link_libraries(file_convert  PUBLIC nlohmann_json::nlohmann_json)
 
 # Create final executable and link libraries
 add_executable(new_test src/main.cpp)
+target_include_directories(new_test PRIVATE include)
 target_link_libraries(new_test
     PUBLIC
         file_convert

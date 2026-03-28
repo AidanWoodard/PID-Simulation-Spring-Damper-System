@@ -28,6 +28,7 @@ class FileReader:
         except FileNotFoundError as e:
             print("\nSIMULATION DATA FILE COULD NOT BE FOUND")
             print("Failed to find", file_path, ", check the path or name")
+            print(e)
 
         except Exception as e:
             print("\nERROR OCURRED WHEN OPENING FILE")

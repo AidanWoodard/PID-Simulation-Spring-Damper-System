@@ -8,10 +8,10 @@ point B with an applied weight (constant).
 #include <thread>
 #include <format>
 #include <fstream>
-#include "../include/phys_sim.hpp"
-#include "../include/PID.hpp"
-#include "../include/file_conv.hpp"
-#include "../include/sim_config.hpp"
+#include "phys_sim.hpp"
+#include "PID.hpp"
+#include "file_conv.hpp"
+#include "sim_config.hpp"
 
 PhysicsSim::PhysicsSim(PIDCalculator& pidRef, FileConverter& fileRef) 
             : pid(pidRef), 
