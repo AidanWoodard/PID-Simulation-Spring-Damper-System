@@ -4,7 +4,7 @@ saved to .csv format by src/file_conv.cpp. This file takes and reads
 the data to be used by data_viz.py, which handles the actual GUI
 """
 
-import pandas as pd
+import pandas as pd # pyright: ignore[reportMissingModuleSource]
 
 class FileReader:
     def __init__(self):
