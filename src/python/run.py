@@ -80,5 +80,5 @@ targets = json_to_csv(targets)
 # run each simulation
 for i, config in enumerate(configs):
     subprocess.run([str(EXE_PATH / "new_test"),
-                    "-config", str(CONFIG_PATH / c),
+                    "-config", str(CONFIG_PATH / config),
                     "-target", str(CSV_PATH / targets[i])])

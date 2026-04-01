@@ -32,8 +32,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     # TODO: impolement above args
-
-    file_reader = fr.FileReader(DATA_DIR / "telemetry.csv")
-    data_vizualizer = dv.DataVisualizer(file_reader) 
-
-    data_vizualizer.generateGraph(show_vel=True, show_pos=True)
+    to_display = ["weak_pid_config.csv", "sharp_pid_config.csv"]
+    for file in to_display:
+        file_reader = fr.FileReader(DATA_DIR / file)
+        data_vizualizer = dv.DataVisualizer(file_reader) 
+        data_vizualizer.generateGraph(show_vel=True, show_pos=True)
