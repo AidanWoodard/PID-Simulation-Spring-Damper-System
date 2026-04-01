@@ -10,20 +10,29 @@ import subprocess
 from pathlib import Path
 import argparse as ap
 
-# arbitrary, but a good precaution. Don't want to accidentally let the user run a massive folder
+def json_to_csv(files) -> list:
+    converted = []
+    for f in files:
+        converted.append(f[:-5] + ".csv")
+    return converted
+
+# arbitrary, but a good precaution
+# don't want to accidentally let the user run a massive folder
 MAX_SIMULATIONS = 50
 
 # current python script dir and project dir
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
 
-# TODO: check for ./new_test build and create one if necessary with cmake commands
-######### here
-
 # other paths we need
 CONFIG_PATH = PROJECT_ROOT / "config"
-EXE_PATH = PROJECT_ROOT / "build" / "./new_test"
+EXE_PATH = PROJECT_ROOT / "build"
+CSV_PATH = PROJECT_ROOT / "data"
 
+builds = list(Path(EXE_PATH).glob("./new_test"))
+if len(builds) > 1: print("ERROR: More than one build found named 'new_test' in build/.")
+
+# Read our arguments from the CLI
 parser = ap.ArgumentParser(
     prog="PID_Simulation",
     description="Simple PID simulation with visualization in Python.",
@@ -32,28 +41,44 @@ parser = ap.ArgumentParser(
             "maximum number of simulations you can run at one time is 50, but use --exempt to override.\n" \
             "The -t flag will show the wall time needed to run all configurations simulated.")
 
-parser.add_argument('--config', required=True, nargs='+',           help="Run the simulation using a specific config (REQUIRED). Either file names (standard_example.json) or a single directory (weak_pid_examples)")
-parser.add_argument('--exempt', action='store_true',                help="Use this flag if you want to ignore max of 50 simulations at one time.")
-parser.add_argument('-v', '--verbose', action='store_true',         help="Run with debug data shown.")
-parser.add_argument('-t', '--showtime', action='store_true',        help="Show final duration of simulation in wall time.")
+parser.add_argument('-c', '--config', required=True, nargs='+',           help="Run the simulation using a specific config (REQUIRED). Either file names (standard_example.json) or a single directory (weak_pid_examples/)")
+parser.add_argument('-e', '--exempt', action='store_true',                help="Use this flag if you want to ignore max of 50 simulations at one time.")
+parser.add_argument('-v', '--verbose', action='store_true',               help="Run with debug data shown.")
+parser.add_argument('-t', '--showtime', action='store_true',              help="Show final duration of simulation in wall time.")
 
 args = parser.parse_args()
 configs:str = []
+targets:str = []    # where to write simulation data
 
+# Parse all of our command line arguments
 if len(args.config) < MAX_SIMULATIONS or args.exempt:
     if len(args.config) == 1 and ".json" not in args.config[0]:
-        print(f"Running all simulations in folder {args.config[0]}.")
-        configs = list(Path(CONFIG_PATH / args.config[0]).glob("*.json"))
+        if args.config[0][-1] == '/':
+            print(f"Running all simulations in folder {args.config[0]}.")
+            config_folder = Path(CONFIG_PATH / args.config[0])
+            configs = list(config_folder.glob("*.json"))
+            targets = list(c.name for c in config_folder.glob("*.json"))
+        else:
+            print("Please use '<folder_name>/' format to denote a folder of configs to simulate. Use --help for more.")
+            exit(1)
     else:
         for c in args.config:
             if ".json" not in c:
-                print("ERROR: all configs must be of type .json.")
+                print("ERROR: all configs must be of type .json or a directory")
                 exit(1)
             print(f"Preparing to start simulation for config {c}...")
             configs.append(Path(CONFIG_PATH / c))
+            targets.append(c)
     if args.verbose: print("verbose mode")
     if args.showtime: print("show wall time")
 else:
     print(f"ERROR: {MAX_SIMULATIONS} simulations maximum. {len(args.config)} simulations requested. Use --exempt to override.")
-    exit(1)
-print(configs)
+
+# 'convert' filename to .csv
+targets = json_to_csv(targets)
+
+# run each simulation
+for i, config in enumerate(configs):
+    subprocess.run([str(EXE_PATH / "new_test"),
+                    "-config", str(CONFIG_PATH / c),
+                    "-target", str(CSV_PATH / targets[i])])

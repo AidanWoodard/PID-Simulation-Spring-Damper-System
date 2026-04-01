@@ -7,8 +7,8 @@ the data to be used by data_viz.py, which handles the actual GUI
 import pandas as pd # pyright: ignore[reportMissingModuleSource]
 
 class FileReader:
-    def __init__(self):
-        self.FILE_PATH = "../../data/telemetry.csv"
+    def __init__(self, data_file_path):
+        self.FILE_PATH = data_file_path
         self.data_file = None
         self.file_line_count : int
         self.BUFFER_LINES_COUNT = 3

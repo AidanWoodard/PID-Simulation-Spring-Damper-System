@@ -15,29 +15,39 @@ visulization scripts in src/python_viz/.
 #include <getopt.h>
 
 int main(int argc, char** argv) {
-    // Before anything else, load in our essential config data for simulation
-    std::ifstream f("../config/sim_config.json");
-    if (!f.is_open()) {
-        std::cerr << "ERROR WHEN OPENING CONFIG: File not found or otherwise couldn't be opened: " << '\n';
+    // Before doing anything, fetch the <config_name>.json config file for this simulation
+    // This is given by run.py which handles more complex arg parsing
+    std::string config_path;
+    std::string csv_target_path;
+    int i;
+    for (i = 1; i < argc; i++) {
+        if (argv[i][0] == '-') {
+            if (argv[i][1] == 'c') {    // c for config
+                config_path = argv[i + 1];
+                std::cout << argv[i + 1] << " Found config" << '\n';
+            } else if (argv[i][1] == 't') {  // t for target csv file
+                csv_target_path = argv[i + 1];
+                std::cout << argv[i + 1] << " Found target" << '\n';
+            } else {
+                std::cerr << "\nERROR: Simulation must be run with proper flags and .json passed.\n" << '\n';
+                throw std::runtime_error("Could not open .json file and run simulation. Exited simulation.");
+            }
+        }
     }
-    nlohmann::json config_data;
-    f >> config_data;
-    AppState::config = SimConfig::from_json(config_data);
-    // int i;
-    // for (i = 1; i < argc; i++) {
-    //     if (argv[i][0] == '-') {
-    //         if (argv[i][1] == '-') {
-    //             std::cout << "Double flag: " << argv[i] << '\n';
-    //         } else {
-    //             std::cout << "Single flag: " << argv[i] << '\n';
-    //         }
-    //     } else if (argv[i][0] != ' ') {
-    //         std::cout << "Argument: " << argv[i] << '\n';
-    //     }
-    // }
-    // return 0;
+
+    // Open the config and use its namespace
+    std::fstream f(config_path);
+    if (!f.is_open()) {
+        std::cerr << "\nERROR WHEN OPENING CONFIG: File not found or otherwise couldn't be opened.\n" << '\n';
+        throw std::runtime_error("Exited simulation.");
+    } else {
+        nlohmann::json config_data;
+        f >> config_data;
+        AppState::config = SimConfig::from_json(config_data);
+    }
+    
     FileConverter fileConv;
-    fileConv.setTargetFile("../data/telemetry.csv");    // FIXME: read from flags in CLI
+    fileConv.setTargetFile(csv_target_path);    // FIXME: read from flags in CLI
 
     double maxSimulationSeconds = 0.8;      // FIXME: add to sim_config.json
 
