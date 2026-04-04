@@ -7,9 +7,10 @@ the data to be used by data_viz.py, which handles the actual GUI
 import pandas as pd # pyright: ignore[reportMissingModuleSource]
 
 class FileReader:
-    def __init__(self, data_file_path):
-        self.FILE_PATH = data_file_path
-        self.data_file = None
+    def __init__(self, data_file_paths):
+        self.FILE_PATHS:list = data_file_paths
+        self.NUM_DATA_FILES = len(self.FILE_PATHS)
+        self.curr_data_file = None
         self.file_line_count : int
         self.BUFFER_LINES_COUNT = 3
         self.POSITION_DATA_HEADER = "Position"
@@ -20,9 +21,9 @@ class FileReader:
     def openDataFile(self, file_path):
         # find and open the file, use safe catches if file misplaced
         try:
-            self.data_file = open(file_path, mode='r')
+            self.curr_data_file = open(file_path, mode='r')
             # https://stackoverflow.com/questions/845058/how-to-get-the-line-count-of-a-large-file-cheaply-in-python
-            self.file_line_count = sum(1 for _ in self.data_file) - self.BUFFER_LINES_COUNT
+            self.file_line_count = sum(1 for _ in self.curr_data_file) - self.BUFFER_LINES_COUNT
             self.closeDataFile()
 
         except FileNotFoundError as e:
@@ -35,13 +36,13 @@ class FileReader:
             print(e)
 
     def closeDataFile(self):
-        if self.data_file:
-            self.data_file.close()
+        if self.curr_data_file:
+            self.curr_data_file.close()
         else:
             print("\nERROR OCURRED: File was never found or opened.")
 
     def parseSimData(self) -> pd.DataFrame:
-        return pd.read_csv(self.FILE_PATH,
+        return pd.read_csv(self.curr_data_file,
                                    header=0,
                                     names=[self.TIME_DATA_HEADER, self.FORCE_DATA_HEADER, self.POSITION_DATA_HEADER, self.VELOCITY_DATA_HEADER],
                                     dtype=float,

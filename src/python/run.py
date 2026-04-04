@@ -10,12 +10,6 @@ import subprocess
 from pathlib import Path
 import argparse as ap
 
-def json_to_csv(files) -> list:
-    converted = []
-    for f in files:
-        converted.append(f[:-5] + ".csv")
-    return converted
-
 # arbitrary, but a good precaution
 # don't want to accidentally let the user run a massive folder
 MAX_SIMULATIONS = 50
@@ -24,13 +18,45 @@ MAX_SIMULATIONS = 50
 SCRIPT_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = SCRIPT_DIR.parent.parent
 
-# other paths we need
-CONFIG_PATH = PROJECT_ROOT / "config"
-EXE_PATH = PROJECT_ROOT / "build"
-CSV_PATH = PROJECT_ROOT / "data"
+# other paths to important folders and files
+CONFIG_FOLDER_PATH = PROJECT_ROOT / "config"
+EXE_FOLDER_PATH = PROJECT_ROOT / "build"
+EXE_PATH = EXE_FOLDER_PATH / "new_test"
+CSV_FOLDER_PATH = PROJECT_ROOT / "data"
 
-builds = list(Path(EXE_PATH).glob("./new_test"))
-if len(builds) > 1: print("ERROR: More than one build found named 'new_test' in build/.")
+def json_to_csv(files) -> list:
+    converted = []
+    for f in files:
+        converted.append(f[:-5] + ".csv")
+    return converted
+
+def _check_and_handle_builds(builds):
+    if not EXE_FOLDER_PATH.is_dir():
+        print("WARNING: No build/ folder found. Running CMake commands...")
+        subprocess.run(["cmake", 
+                        "-B", str(EXE_FOLDER_PATH), 
+                        "-S", str(PROJECT_ROOT)], 
+                        check=True)
+        subprocess.run(["make"], 
+                       cwd=str(EXE_FOLDER_PATH), 
+                       check=True)  
+    elif len(builds) > 1:
+        print("ERROR: More than one build found named 'new_test' in build/. Remaking build...")
+        subprocess.run(["cmake", 
+                        "-B", str(EXE_FOLDER_PATH), 
+                        "--target", "clean"], 
+                        check=True)
+        subprocess.run(["make"], 
+                       cwd=str(EXE_FOLDER_PATH), 
+                       check=True)
+    elif len(builds) == 0: 
+        print("Build file 'new_test' not found. Running make command...")
+        subprocess.run(["make"], 
+                       cwd=str(EXE_FOLDER_PATH), 
+                       check=True)
+
+builds = list(Path(EXE_FOLDER_PATH).glob("./new_test"))
+_check_and_handle_builds(builds)
 
 # Read our arguments from the CLI
 parser = ap.ArgumentParser(
@@ -45,6 +71,8 @@ parser.add_argument('-c', '--config', required=True, nargs='+',           help="
 parser.add_argument('-e', '--exempt', action='store_true',                help="Use this flag if you want to ignore max of 50 simulations at one time.")
 parser.add_argument('-v', '--verbose', action='store_true',               help="Run with debug data shown.")
 parser.add_argument('-t', '--showtime', action='store_true',              help="Show final duration of simulation in wall time.")
+# TODO: add ability to create a folder to store all final .csv data with the --folder <name>
+# This way, the use will be able to enter pidviz --specify <name>/ and run all .csv
 
 args = parser.parse_args()
 configs:str = []
@@ -55,7 +83,7 @@ if len(args.config) < MAX_SIMULATIONS or args.exempt:
     if len(args.config) == 1 and ".json" not in args.config[0]:
         if args.config[0][-1] == '/':
             print(f"Running all simulations in folder {args.config[0]}.")
-            config_folder = Path(CONFIG_PATH / args.config[0])
+            config_folder = Path(CONFIG_FOLDER_PATH / args.config[0])
             configs = list(config_folder.glob("*.json"))
             targets = list(c.name for c in config_folder.glob("*.json"))
         else:
@@ -67,7 +95,7 @@ if len(args.config) < MAX_SIMULATIONS or args.exempt:
                 print("ERROR: all configs must be of type .json or a directory")
                 exit(1)
             print(f"Preparing to start simulation for config {c}...")
-            configs.append(Path(CONFIG_PATH / c))
+            configs.append(Path(CONFIG_FOLDER_PATH / c))
             targets.append(c)
     if args.verbose: print("verbose mode")
     if args.showtime: print("show wall time")
@@ -79,6 +107,7 @@ targets = json_to_csv(targets)
 
 # run each simulation
 for i, config in enumerate(configs):
-    subprocess.run([str(EXE_PATH / "new_test"),
-                    "-config", str(CONFIG_PATH / config),
-                    "-target", str(CSV_PATH / targets[i])])
+    subprocess.run([str(EXE_PATH),
+                    "-config", str(CONFIG_FOLDER_PATH / config),
+                    "-target", str(CSV_FOLDER_PATH / targets[i])], check=True)
+    

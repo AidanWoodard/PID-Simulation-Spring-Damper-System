@@ -5,7 +5,7 @@ enter simulation data into telemetry.csv, which is used by python
 visulization scripts in src/python_viz/.
 */
 
-#include "file_conv.hpp"         // "../etc" is poor practice, fix when polishing project
+#include "file_conv.hpp"
 #include "phys_sim.hpp"
 #include "PID.hpp"
 #include "sim_config.hpp"
@@ -24,10 +24,8 @@ int main(int argc, char** argv) {
         if (argv[i][0] == '-') {
             if (argv[i][1] == 'c') {    // c for config
                 config_path = argv[i + 1];
-                std::cout << argv[i + 1] << " Found config" << '\n';
             } else if (argv[i][1] == 't') {  // t for target csv file
                 csv_target_path = argv[i + 1];
-                std::cout << argv[i + 1] << " Found target" << '\n';
             } else {
                 std::cerr << "\nERROR: Simulation must be run with proper flags and .json passed.\n" << '\n';
                 throw std::runtime_error("Could not open .json file and run simulation. Exited simulation.");
