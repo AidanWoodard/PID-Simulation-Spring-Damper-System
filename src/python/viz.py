@@ -22,7 +22,7 @@ if __name__ == "__main__":
         prog="PID_Visualizer",
         description="Simple PID simulation with visualization in Python.",
         epilog="Use the above flags and args to visualize and graph simulation data. ,\n" \
-            "The --specify <name.csv> is not required but visualization will default to all data in\n" \
+            "The --specify <name.csv> is not required but the visualization will default to all data in\n" \
                 "'data/' folder. It is highly recommended to specify which .csv files or which folder\n" \
                 "should be displayed. Use --help when running simulations to learn how to create a data folder.")
 
