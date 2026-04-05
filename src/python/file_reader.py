@@ -9,6 +9,7 @@ import pandas as pd # pyright: ignore[reportMissingModuleSource]
 class FileReader:
     def __init__(self, data_file_paths):
         self.FILE_PATHS:list = data_file_paths
+        print(type(self.FILE_PATHS))
         self.NUM_DATA_FILES = len(self.FILE_PATHS)
         self.curr_data_file = None
         self.file_line_count : int

@@ -11,7 +11,7 @@ import pandas as pd # type: ignore
 class DataVisualizer:
     def __init__(self, file_reader:fr, animated=False, show_legend=True):
         self.file_reader = file_reader
-        self.PLOT_TITLE = "1 Dimension PID Simulated Control"
+        self.PLOT_TITLE = "1-Dimension PID Simulated Control"
         self.ANIMATED = animated
         if animated: 
             self.animation_length_ms : int
@@ -40,27 +40,24 @@ class DataVisualizer:
         ax.legend()
         plt.show()
 
-    def createWindow(self, show_pos=False, show_vel=False, show_applied_force=False):
+    """Create initial window with subplots inside of it. Only called once"""
+    def createWindow(self, rows=1, columns=1, show_pos=False, show_vel=False, show_applied_force=False):
         if not(show_pos or show_vel or show_applied_force):
             print("ERROR ENCOUNTERED WHEN GENERATING GRAPH: No data instructed to display.\nDid you forget to set show_pos, etc. to True?")
             raise Exception
         
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(nrows=rows, ncols=columns, layout="contrained")
         ax.xaxis.set_label_text("Time dt (Seconds)")
         ax.set_title(self.PLOT_TITLE)
         return fig, ax
-    
-    def displayGraph(new_plot:list[2], show_legend=True):
-        fig, ax = new_plot
         
-
     def setAnimationTime(self, duration_ms:int):
         # make sure plot is supposed to be animated (encapsulation, good practice)
         if self.ANIMATED and duration_ms > self.MIN_ANIM_LENGTH_MS and duration_ms < self.MAX_ANIM_LENGTH_MS:
             self.animation_length_ms = duration_ms
         elif not self.ANIMATED:
-            print("ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME:\nGraph not supposed to be animated.")
+            print("ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME:\nGraph not supposed to be animated. Make sure to use the animated flag when running simulation.")
             raise IOError
         else:
-            print(f"ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME.\nInputed time: {duration_ms}\n")
+            print(f"ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME.\nInputed time {duration_ms} must be within {self.MIN_ANIM_LENGTH_MS} and {self.MAX_ANIM_LENGTH_MS} milliseconds.\n")
             raise IOError
