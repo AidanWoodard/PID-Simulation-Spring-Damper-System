@@ -7,6 +7,7 @@ a Position vs. Time graph, and initial paramaters of the simulation will be show
 import file_reader as fr
 import matplotlib.pyplot as plt
 import pandas as pd # type: ignore
+from pathlib import Path
 
 class DataVisualizer:
     def __init__(self, file_reader:fr, animated=False, show_legend=True):
@@ -18,35 +19,39 @@ class DataVisualizer:
             self.MAX_ANIM_LENGTH_MS = 10*1000   # 10 seconds
             self.MIN_ANIM_LENGTH_MS = 0
 
-    """This returns a new figure and axis as a list [fig, ax] with the new data graphed"""
-    def generateGraph(self, show_pos=False, show_vel=False, show_applied_force=False) -> list:
+    """Create all graphs using helper function _generateNewGraph to display new data. Return those graphs"""
+    def generateGraphs(self, sim_data_files:list, fig, ax, format:dict) -> tuple:
+        for i, curr_path in enumerate(sim_data_files):
+            parsed_sim_data = self.file_reader.parseSimData(curr_path, debug=format["verbose"])
+            fix, ax = self._generateNewGraph(parsed_sim_data, fig, ax, format)
+        if format["show_legend"]: ax.legend()
+        return fig, ax
+
+    """Generate a new graph on the given axis and figure. Return that new graph"""
+    def _generateNewGraph(self, parsed_sim_data, fig, ax, format:dict) -> tuple:
         # create a graph and show data
-        for i in range(self.file_reader.NUM_DATA_FILES):
-            self.file_reader.openDataFile(self.file_reader.FILE_PATHS[i])
-            parsed_sim_data = self.file_reader.parseSimData()
-            fig, ax = self.createWindow(show_pos, show_vel, show_applied_force)
-            if show_pos: ax.plot(
-                                parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
-                                parsed_sim_data[self.file_reader.POSITION_DATA_HEADER], 
-                                label=self.file_reader.POSITION_DATA_HEADER)
-            if show_vel: ax.plot(
-                                parsed_sim_data[self.file_reader.TIME_DATA_HEADER],
-                                parsed_sim_data[self.file_reader.VELOCITY_DATA_HEADER], 
-                                label=self.file_reader.VELOCITY_DATA_HEADER)
-            if show_applied_force: ax.plot(
-                                parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
-                                parsed_sim_data[self.file_reader.FORCE_DATA_HEADER], 
-                                label=self.file_reader.FORCE_DATA_HEADER)
-        ax.legend()
-        plt.show()
+        if format["show_pos"]: ax.plot(
+                            parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
+                            parsed_sim_data[self.file_reader.POSITION_DATA_HEADER], 
+                            label=self.file_reader.POSITION_DATA_HEADER)
+        if format["show_vel"]: ax.plot(
+                            parsed_sim_data[self.file_reader.TIME_DATA_HEADER],
+                            parsed_sim_data[self.file_reader.VELOCITY_DATA_HEADER], 
+                            label=self.file_reader.VELOCITY_DATA_HEADER)
+        if format["show_applied_force"]: ax.plot(
+                            parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
+                            parsed_sim_data[self.file_reader.FORCE_DATA_HEADER], 
+                            label=self.file_reader.FORCE_DATA_HEADER)
+        return fig, ax
 
     """Create initial window with subplots inside of it. Only called once"""
-    def createWindow(self, rows=1, columns=1, show_pos=False, show_vel=False, show_applied_force=False):
-        if not(show_pos or show_vel or show_applied_force):
-            print("ERROR ENCOUNTERED WHEN GENERATING GRAPH: No data instructed to display.\nDid you forget to set show_pos, etc. to True?")
+    def createWindow(self, format:dict, rows=1, columns=1) -> tuple:
+        if not(format["show_pos"] or format["show_vel"] or format["show_applied_force"]):
+            print("ERROR ENCOUNTERED WHEN GENERATING GRAPH: No data instructed to display. \
+                  \nDid you forget to set show_pos, etc. to True?")
             raise Exception
         
-        fig, ax = plt.subplots(nrows=rows, ncols=columns, layout="contrained")
+        fig, ax = plt.subplots(nrows=rows, ncols=columns, layout="constrained")
         ax.xaxis.set_label_text("Time dt (Seconds)")
         ax.set_title(self.PLOT_TITLE)
         return fig, ax
@@ -56,8 +61,11 @@ class DataVisualizer:
         if self.ANIMATED and duration_ms > self.MIN_ANIM_LENGTH_MS and duration_ms < self.MAX_ANIM_LENGTH_MS:
             self.animation_length_ms = duration_ms
         elif not self.ANIMATED:
-            print("ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME:\nGraph not supposed to be animated. Make sure to use the animated flag when running simulation.")
+            print("ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME:\nGraph not supposed to be animated. \
+                  Make sure to use the animated flag when running simulation.")
             raise IOError
         else:
-            print(f"ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME.\nInputed time {duration_ms} must be within {self.MIN_ANIM_LENGTH_MS} and {self.MAX_ANIM_LENGTH_MS} milliseconds.\n")
+            print(f"ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME. \
+                  \nInputed time {duration_ms} must be within {self.MIN_ANIM_LENGTH_MS} and \
+                    {self.MAX_ANIM_LENGTH_MS} milliseconds.\n")
             raise IOError

@@ -7,10 +7,7 @@ the data to be used by data_viz.py, which handles the actual GUI
 import pandas as pd # pyright: ignore[reportMissingModuleSource]
 
 class FileReader:
-    def __init__(self, data_file_paths):
-        self.FILE_PATHS:list = data_file_paths
-        print(type(self.FILE_PATHS))
-        self.NUM_DATA_FILES = len(self.FILE_PATHS)
+    def __init__(self):
         self.curr_data_file = None
         self.file_line_count : int
         self.BUFFER_LINES_COUNT = 3
@@ -19,35 +16,33 @@ class FileReader:
         self.FORCE_DATA_HEADER = "Force"
         self.TIME_DATA_HEADER = "Time"
 
-    def openDataFile(self, file_path):
-        # find and open the file, use safe catches if file misplaced
+    def parseSimData(self, sim_data_path, debug=False) -> pd.DataFrame:
         try:
-            self.curr_data_file = open(file_path, mode='r')
-            # https://stackoverflow.com/questions/845058/how-to-get-the-line-count-of-a-large-file-cheaply-in-python
-            self.file_line_count = sum(1 for _ in self.curr_data_file) - self.BUFFER_LINES_COUNT
-            self.closeDataFile()
+            parsed_data = pd.read_csv(sim_data_path,
+                                    header=0,
+                                        names=[self.TIME_DATA_HEADER, self.FORCE_DATA_HEADER, self.POSITION_DATA_HEADER, self.VELOCITY_DATA_HEADER],
+                                        dtype=float,
+                                        skip_blank_lines=True)
+            
+            if debug:
+                print("\tDEBUG DATA")
+                print("="*10)
+                print(f"Parsing data in {self.curr_data_file}...")
+                print(f"Columns loaded: {parsed_data.columns.tolist()}")
+                print(f"First 10 rows of data:")
+                print(parsed_data.head(10))
+                print("="*10)
 
+            return parsed_data  
+        
         except FileNotFoundError as e:
-            print("\nSIMULATION DATA FILE COULD NOT BE FOUND")
-            print("Failed to find", file_path, ", check the path or name")
+            print("\nERROR ENCOUNTERED WHEN PARSING FILE: simulation data file could not be found.")
+            print("Failed to find", sim_data_path, ", check the path or name. Is is in the data/ folder?")
             print(e)
 
         except Exception as e:
-            print("\nERROR OCURRED WHEN OPENING FILE")
+            print("\nERROR OCURRED WHEN OPENING FILE FOR DATA PARSING:")
             print(e)
-
-    def closeDataFile(self):
-        if self.curr_data_file:
-            self.curr_data_file.close()
-        else:
-            print("\nERROR OCURRED: File was never found or opened.")
-
-    def parseSimData(self) -> pd.DataFrame:
-        return pd.read_csv(self.curr_data_file,
-                                   header=0,
-                                    names=[self.TIME_DATA_HEADER, self.FORCE_DATA_HEADER, self.POSITION_DATA_HEADER, self.VELOCITY_DATA_HEADER],
-                                    dtype=float,
-                                    skip_blank_lines=True)
 
     def collectSimSettings(self):
         # return a python dict of all simulation settings like target position, etc. from
