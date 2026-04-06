@@ -60,10 +60,9 @@ if __name__ == "__main__":
     MAX_SIMULATIONS_SUGGESTED = 50              # allow up to 50 different simulations combined
     MAX_SIMULATIONS_DIVIDED_DISPLAY = 9         # max simulations when diplayed in separate graphs
 
+    # handle arguments and create a format dictionary to pass to the visualizer
     parser = _create_custom_parser()
     args = parser.parse_args()
-    # TODO: impolement above args
-    animate_graph = False
     data_file_paths:list = [DATA_DIR / "sharp_pid_config.csv", DATA_DIR / "weak_pid_config.csv"]    # FIXME: temporary
     graph_format = _parse_graph_format(args)
     
