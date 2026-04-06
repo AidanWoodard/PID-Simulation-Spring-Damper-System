@@ -63,9 +63,22 @@ if __name__ == "__main__":
     # handle arguments and create a format dictionary to pass to the visualizer
     parser = _create_custom_parser()
     args = parser.parse_args()
-    data_file_paths:list = [DATA_DIR / "sharp_pid_config.csv", DATA_DIR / "weak_pid_config.csv"]    # FIXME: temporary
+    data_file_paths = []
     graph_format = _parse_graph_format(args)
-    
+
+    # collect all of our data files and folders into data_file_paths
+    for i, data_file in enumerate(args.specify):
+        if ".csv" == data_file[-4:]:
+            data_file_paths.append(Path(DATA_DIR / data_file))
+        elif data_file[-1] == '/':
+            data_folder_to_search = Path(DATA_DIR / data_file)
+            new_data_files = list(file.name for file in data_folder_to_search.glob("*.csv"))
+            for path in new_data_files: data_file_paths.append(Path(DATA_DIR / data_file / path))
+        else:
+            print("ERROR: all data files must be of type .csv or a directory with a backslash.")
+            exit(1)
+        print(f"Preparing to display simulation for data file {data_file}...")
+
     file_reader_obj = fr.FileReader()
     data_vizualizer = dv.DataVisualizer(file_reader_obj, animated=graph_format["animated"], show_legend=graph_format["show_legend"])
 
