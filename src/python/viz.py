@@ -21,14 +21,14 @@ def _create_custom_parser() -> ap.ArgumentParser:
                 "should be displayed. Use --help when running simulations to learn how to create a data folder.")
 
     parser.add_argument('-d', '--divided', action='store_true',             help=f"Use this flag to display up to {MAX_SIMULATIONS_DIVIDED_DISPLAY} graphs in separate graphs rather than one combined graph.")
-    parser.add_argument('-s', '--specify', nargs='+',                       help="List specific .csv files in data/ to display. They have same names as their config.json files.")
+    parser.add_argument('-s', '--specify', nargs='+', default=".",          help="List specific .csv files in data/ to display. They have same names as their config.json files.")
     parser.add_argument('-p', '--showpos', action='store_true',             help="Display position data")
-    parser.add_argument('-ve', '--showvel', action='store_true',             help="Display velocity data.")
+    parser.add_argument('-ve', '--showvel', action='store_true',            help="Display velocity data.")
     parser.add_argument('-af', '--showappliedforce', action='store_true',   help="Display applied force data.")
     parser.add_argument('-nl', '--nolegend', action='store_true',           help="Display graph without legend.")
     parser.add_argument('-e', '--exempt', action='store_true',              help=f"Use this flag if you want to ignore max of {MAX_SIMULATIONS_SUGGESTED} simulations displayed in one graph.")
     parser.add_argument('--animated', type=int, default=0,                  help="Use this flag to display the graph animated over an inputted millisecond duration.")
-    parser.add_argument('-v', "--verbose", action="store_true",                   help="Use this flag for basic debug data when parsing .csv data files.")
+    parser.add_argument('-v', "--verbose", action="store_true",             help="Use this flag for basic debug data when parsing .csv data files.")
 
     return parser
 
@@ -63,6 +63,7 @@ if __name__ == "__main__":
     # handle arguments and create a format dictionary to pass to the visualizer
     parser = _create_custom_parser()
     args = parser.parse_args()
+    print(args.specify)
     data_file_paths = []
     graph_format = _parse_graph_format(args)
 
@@ -70,7 +71,7 @@ if __name__ == "__main__":
     for i, data_file in enumerate(args.specify):
         if ".csv" == data_file[-4:]:
             data_file_paths.append(Path(DATA_DIR / data_file))
-        elif data_file[-1] == '/':
+        elif data_file[-1] == '/' or data_file == '.':
             data_folder_to_search = Path(DATA_DIR / data_file)
             new_data_files = list(file.name for file in data_folder_to_search.glob("*.csv"))
             for path in new_data_files: data_file_paths.append(Path(DATA_DIR / data_file / path))
