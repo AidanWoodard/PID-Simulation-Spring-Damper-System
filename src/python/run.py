@@ -107,6 +107,11 @@ if (__name__) == "__main__":
         if args.showtime: print("show wall time")
     else:
         print(f"ERROR: {MAX_SIMULATIONS} simulations maximum. {len(args.config)} simulations requested. Use --exempt to override.")
+    # TODO: Allow for named folder targets to sit in data/ directory for simulation data
+    # TODO: Create new data/ folder if none exists yet
+    if not CSV_FOLDER_PATH.is_dir():
+        print("WARNING: Data/ folder not found in project root, creating a new one...")
+        CSV_FOLDER_PATH.mkdir(parents=True, exist_ok=True)
 
     # 'convert' filename to .csv
     targets = json_to_csv(targets)

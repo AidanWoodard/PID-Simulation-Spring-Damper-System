@@ -61,7 +61,8 @@ class DataVisualizer:
         if not(format["show_pos"] or format["show_vel"] or format["show_applied_force"]):
             print("ERROR ENCOUNTERED WHEN GENERATING GRAPH: No data instructed to display. \
                   \nDid you forget to set show_pos, etc. to True?")
-            raise Exception
+            print("(Exiting program...)")
+            exit(1)
         
         fig, ax = plt.subplots(nrows=rows, ncols=columns, layout="constrained")
         ax.xaxis.set_label_text("Time dt (Seconds)")
@@ -75,9 +76,11 @@ class DataVisualizer:
         elif not self.ANIMATED:
             print("ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME:\nGraph not supposed to be animated. \
                   Make sure to use the animated flag when running simulation.")
-            raise IOError
+            print("(Exiting program...)")
+            exit(1)
         else:
             print(f"ERROR ENCOUNTERED WHILE UPDATING ANIMATION TIME. \
                   \nInputed time {duration_ms} must be within {self.MIN_ANIM_LENGTH_MS} and \
                     {self.MAX_ANIM_LENGTH_MS} milliseconds.\n")
-            raise IOError
+            print("(Exiting program...)")
+            exit(1)

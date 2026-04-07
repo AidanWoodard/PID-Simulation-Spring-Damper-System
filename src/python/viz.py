@@ -11,6 +11,23 @@ import matplotlib.pyplot as plt
 
 import data_viz as dv, file_reader as fr
 
+def _get_graph_row_col(num_graphs:int) -> list:
+    """Return the format of graphs in the form [row, col]. Currently limited to 3x3 graph layout."""
+    dimensions = []
+    if num_graphs <= 0:
+        print("ERROR: Fewer than 1 graphs attempted to display.\nUse --specify <name.csv> or --specify <folder>/ to ensure you're displaying data.\nOmiting --specify will default to all .csv files in data/ folder, excluding subfolders.")
+        exit(1)
+    if num_graphs <= 2: return [1, 2]       # 2x1 two graphs side by side
+    elif num_graphs <= 4: return [2, 2]     # 2x2 four graph layout
+    elif num_graphs <= 6: return [2, 3]     # 3x2 six graphs layout
+    elif num_graphs <= 9: return [3, 3]
+    elif num_graphs >= MAX_SIMULATIONS_DIVIDED_DISPLAY:
+        print(f"ERROR ENCOUNTERED WHEN DISPLAYING DIVIDED GRAPHS: Maximum number of graphs to display divided is {MAX_SIMULATIONS_DIVIDED_DISPLAY} graphs.\nOmit the --divided flag to display more than {MAX_SIMULATIONS_DIVIDED_DISPLAY} graphs in one combined graph.")
+        exit(1)
+    else:
+        print(f"ERROR ENCOUNTERED WHEN DISPLAYING DIVIDED GRAPHS: {num_graphs} graphs requested to display in divided format.\nUse --help to learn more about how to display in divided graphs format.")
+        exit(1)
+
 def _create_custom_parser() -> ap.ArgumentParser:
     parser = ap.ArgumentParser(
         prog="PID_Visualizer",
@@ -53,8 +70,6 @@ def _parse_graph_format(args) -> dict:
 if __name__ == "__main__":
     SCRIPT_DIR = Path(__file__).resolve().parent
     DATA_DIR = SCRIPT_DIR.parent.parent / "data"
-    
-    # TODO: add checker and handler if data folder at DATA_DIR doesn't exist yet
 
     MAX_SIMULATIONS = 200                       # allow this many if --exempt flag used
     MAX_SIMULATIONS_SUGGESTED = 50              # allow up to 50 different simulations combined
@@ -63,7 +78,6 @@ if __name__ == "__main__":
     # handle arguments and create a format dictionary to pass to the visualizer
     parser = _create_custom_parser()
     args = parser.parse_args()
-    print(args.specify)
     data_file_paths = []
     graph_format = _parse_graph_format(args)
 

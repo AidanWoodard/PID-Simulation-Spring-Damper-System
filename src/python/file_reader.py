@@ -38,11 +38,11 @@ class FileReader:
         except FileNotFoundError as e:
             print("\nERROR ENCOUNTERED WHEN PARSING FILE: simulation data file could not be found.")
             print("Failed to find", sim_data_path, ", check the path or name. Is is in the data/ folder?")
-            print(e)
+            exit(1)
 
         except Exception as e:
             print("\nERROR OCURRED WHEN OPENING FILE FOR DATA PARSING:")
-            print(e)
+            exit(1)
 
     def collectSimSettings(self):
         # return a python dict of all simulation settings like target position, etc. from
