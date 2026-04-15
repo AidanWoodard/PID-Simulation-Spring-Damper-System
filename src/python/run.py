@@ -10,6 +10,8 @@ import subprocess
 from pathlib import Path
 import argparse as ap
 
+from tools import json_to_csv, get_data_files
+
 # arbitrary, but a good precaution
 # don't want to accidentally let the user run a massive folder
 MAX_SIMULATIONS = 50
@@ -24,12 +26,6 @@ CONFIG_FOLDER_PATH = PROJECT_ROOT / "config"
 EXE_FOLDER_PATH = PROJECT_ROOT / "build"
 EXE_PATH = EXE_FOLDER_PATH / EXE_FILE_NAME
 CSV_FOLDER_PATH = PROJECT_ROOT / "data"
-
-def json_to_csv(files) -> list:
-    converted = []
-    for f in files:
-        converted.append(f[:-5] + ".csv")
-    return converted
 
 def _check_and_handle_builds():
     """Make sure our build file exists for when we call it later, and create it if it doesn't exist."""
@@ -72,8 +68,7 @@ def _create_custom_parser() -> ap.ArgumentParser:
     parser.add_argument('-e', '--exempt', action='store_true',                help="Use this flag if you want to ignore max of 50 simulations at one time.")
     parser.add_argument('-v', '--verbose', action='store_true',               help="Run with debug data shown.")
     parser.add_argument('-t', '--showtime', action='store_true',              help="Show final duration of simulation in wall time.")
-    # TODO: add ability to create a folder to store all final .csv data with the --folder <name>
-    # This way, the use will be able to enter pidviz --specify <name>/ and run all .csv
+    parser.add_argument('-fo', '--folder', type=str, default='',              help="Store all simulation data in a folder of given name (--folder <new_name>).")
 
     return parser
 
@@ -107,12 +102,11 @@ if (__name__) == "__main__":
         if args.showtime: print("show wall time")
     else:
         print(f"ERROR: {MAX_SIMULATIONS} simulations maximum. {len(args.config)} simulations requested. Use --exempt to override.")
-    # TODO: Allow for named folder targets to sit in data/ directory for simulation data
-    # TODO: Create new data/ folder if none exists yet
+
     if not CSV_FOLDER_PATH.is_dir():
         print("WARNING: Data/ folder not found in project root, creating a new one...")
         CSV_FOLDER_PATH.mkdir(parents=True, exist_ok=True)
-
+    # TODO: allow for extra file creation by creating new dir in data/ and adding prefix to all paths in target[]
     # 'convert' filename to .csv
     targets = json_to_csv(targets)
 
