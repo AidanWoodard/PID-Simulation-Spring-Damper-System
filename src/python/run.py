@@ -10,7 +10,7 @@ import subprocess
 from pathlib import Path
 import argparse as ap
 
-from tools import json_to_csv, get_data_files
+from tools import change_extension, get_data_files
 
 # arbitrary, but a good precaution
 # don't want to accidentally let the user run a massive folder
@@ -54,6 +54,14 @@ def _check_and_handle_builds():
                        cwd=str(EXE_FOLDER_PATH), 
                        check=True)
 
+def _get_target_paths_from_configs(configs:list, head_dir:Path) -> list:
+    """Create a list of the target folder paths using the file names in configs"""
+    targets:Path = []
+    curr_filename:str = ""
+    for c in configs: targets.append(Path(head_dir / change_extension(c, ".csv")))
+    
+    return targets
+
 def _create_custom_parser() -> ap.ArgumentParser:
     # Read our arguments from the CLI
     parser = ap.ArgumentParser(
@@ -76,43 +84,30 @@ if (__name__) == "__main__":
     _check_and_handle_builds()
     parser = _create_custom_parser()
     args = parser.parse_args()
-    configs:str = []
-    targets:str = []    # where to write simulation data
-
-    # Parse all of our command line arguments
-    if len(args.config) < MAX_SIMULATIONS or args.exempt:
-        if len(args.config) == 1 and ".json" not in args.config[0]:
-            if args.config[0][-1] == '/':
-                print(f"Running all simulations in folder {args.config[0]}.")
-                config_folder = Path(CONFIG_FOLDER_PATH / args.config[0])
-                configs = list(config_folder.glob("*.json"))
-                targets = list(c.name for c in config_folder.glob("*.json"))
-            else:
-                print("Please use '<folder_name>/' format to denote a folder of configs to simulate. Use --help for more.")
-                exit(1)
-        else:
-            for c in args.config:
-                if ".json" not in c:
-                    print("ERROR: all configs must be of type .json or a directory")
-                    exit(1)
-                print(f"Preparing to start simulation for config {c}...")
-                configs.append(Path(CONFIG_FOLDER_PATH / c))
-                targets.append(c)
-        if args.verbose: print("verbose mode")
-        if args.showtime: print("show wall time")
-    else:
-        print(f"ERROR: {MAX_SIMULATIONS} simulations maximum. {len(args.config)} simulations requested. Use --exempt to override.")
 
     if not CSV_FOLDER_PATH.is_dir():
         print("WARNING: Data/ folder not found in project root, creating a new one...")
         CSV_FOLDER_PATH.mkdir(parents=True, exist_ok=True)
-    # TODO: allow for extra file creation by creating new dir in data/ and adding prefix to all paths in target[]
-    # 'convert' filename to .csv
-    targets = json_to_csv(targets)
+
+    # if user specified for a target folder to be make for final .csv data, make it (ie --folder my_sims)
+    if args.folder != '':
+        new_target_folder = CSV_FOLDER_PATH / str(args.folder)
+        if not new_target_folder.is_dir():
+            new_target_folder.mkdir()
+        CSV_FOLDER_PATH = new_target_folder
+
+    # find configs and csv target locations
+    configs:Path = get_data_files(args.config, ".json", CONFIG_FOLDER_PATH)
+    csv_targets:Path = _get_target_paths_from_configs(configs, CSV_FOLDER_PATH)
+
+    # limit max sims
+    if not args.exempt and len(configs) > MAX_SIMULATIONS:
+        print(f"ERROR: {MAX_SIMULATIONS} simulations maximum. {len(args.config)} simulations requested. Use --exempt to override.")
+        exit(0)
 
     # run each simulation
     for i, config in enumerate(configs):
         subprocess.run([str(EXE_PATH),
                         "-config", str(CONFIG_FOLDER_PATH / config),
-                        "-target", str(CSV_FOLDER_PATH / targets[i])], check=True)
+                        "-target", str(CSV_FOLDER_PATH / csv_targets[i])], check=True)
         

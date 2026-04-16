@@ -9,7 +9,7 @@ from pathlib import Path
 import argparse as ap
 import matplotlib.pyplot as plt
 
-import data_viz as dv, file_reader as fr
+import data_visualizer as dv, file_reader as fr
 from tools import get_data_files
 
 def _get_graph_row_col(num_graphs:int) -> list:
