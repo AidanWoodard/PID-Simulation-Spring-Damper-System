@@ -23,7 +23,7 @@ class PhysicsSim {
     const double GRAV_FORCE = AppState::config.grav_accel * OBJECT_MASS;
     const double FIXED_DT = AppState::config.dt;
 
-    constexpr static double KILL_SWITCH_SIM_TIME = 20.0;   // sim time, not wall time
+    constexpr static double KILL_SWITCH_SIM_TIME = 5.0;   // sim time, not wall time
     constexpr static int TICKS_PER_KILL_SWITCH_CHECK = 200;
 
     PIDCalculator& pid;

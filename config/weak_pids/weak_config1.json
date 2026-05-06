@@ -9,9 +9,9 @@
         "target_post": 10.0
     },
     "pid_gains": {
-        "kp": 10.0,
-        "ki": 1.0,
-        "kd": 7.0
+        "kp": 32.0,
+        "ki": 5.0,
+        "kd": 10.0
     },
     "data_handling": {
         "record_sim_duration": true
