@@ -108,6 +108,14 @@ if (__name__) == "__main__":
     # run each simulation
     for i, config in enumerate(configs):
         subprocess.run([str(EXE_PATH),
-                        "-config", str(CONFIG_FOLDER_PATH / config),
-                        "-target", str(CSV_FOLDER_PATH / csv_targets[i])], check=True)
-        
+                            str(CONFIG_FOLDER_PATH / config),
+                            str(CSV_FOLDER_PATH / csv_targets[i]),
+                            str(args.verbose)], check=True)
+    
+    # display final times after all have finished (in case of verbose mode)
+    if args.showtime:
+        for target in enumerate(csv_targets):
+            with open(target[1]) as f:
+                f.readline()            # FIXME: read headers properly, this just skips first line (titles)
+                print(f.readline())     # (first line of data, fix later to display time)
+
