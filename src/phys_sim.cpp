@@ -18,7 +18,7 @@ PhysicsSim::PhysicsSim(PIDCalculator& pidRef, FileConverter& fileRef)
             fileWriter(fileRef) {}
 
 double PhysicsSim::calculateAccel(double inputForce) {
-    return (inputForce - GRAV_FORCE) / OBJECT_MASS;
+    return (inputForce - GRAV_FORCE) / OBJECT_MASS;         // f = m / a
 }
 
 void PhysicsSim::update(double simTime) {
@@ -30,7 +30,9 @@ void PhysicsSim::update(double simTime) {
     fileWriter.recordData(simTime, appliedForce, getPosition(), getVelocity());
 }
 
-std::chrono::duration<double> PhysicsSim::getElapsedTime() {}   //FIXME   
+std::chrono::duration<double> PhysicsSim::getElapsedTime() {
+    // FIXME: get wall time of simulation duration (ie 0.0078sec)
+}
 
 void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
     const auto startWallTime = std::chrono::steady_clock::now();
@@ -47,7 +49,8 @@ void PhysicsSim::beginSimulation(double maxRuntimeSeconds) {
         // simulation clock kill switch
         if (simTime >= KILL_SWITCH_SIM_TIME) {
             // FIXME: not saving final sim time
-            //fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedWallTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
+            const std::chrono::duration<double> elapsedWallTime{std::chrono::steady_clock::now() - startWallTime};
+            fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::nanoseconds>(elapsedWallTime).count(), std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
             simActive = false;
         }
 

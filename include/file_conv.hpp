@@ -4,10 +4,11 @@
 #include <vector>
 #include <string>
 #include "phys_sim.hpp"
+#include "sim_config.hpp"
 
 class FileConverter {
     public:
-    FileConverter();
+    FileConverter() {}
     void recordData(double time,
                     double appliedF,
                     double currPos,
@@ -16,11 +17,13 @@ class FileConverter {
     void setTargetFile(std::string fileName);
     void clearTargetFile(std::string fileName);
     void displayFinalPosData();
+    void displayFinalVerboseData();
     void saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs);
 
     private:
     std::vector<SimDataPoint> logBuffer;
     std::string targetFileName;
+    int fillerDuration = 5;  // fake simulation duration, unitless
 };
 
 #endif

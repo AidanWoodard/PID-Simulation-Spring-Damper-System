@@ -1,12 +1,15 @@
 #ifndef PID_HPP
 #define PID_HPP
 
+#include "sim_config.hpp"
+
 class PIDCalculator {
-    public:
-    // the "P, I, D" values
-    PIDCalculator(double p, 
-                double i,
-                double d);
+    public:    
+    PIDCalculator()
+        : kp(AppState::config.kp), 
+        ki(AppState::config.ki), 
+        kd(AppState::config.kd),
+        simTargetPos(AppState::config.targetPos) {}
 
     void resetPID();
     double calculateAppliedForce(double pos,
@@ -19,10 +22,9 @@ class PIDCalculator {
     double kp;
     double ki;
     double kd;
-    double simTargetPos;
-
-    // refactor later. Temporary naming
     double sumError;
+
+    double simTargetPos;
 };
 
 #endif

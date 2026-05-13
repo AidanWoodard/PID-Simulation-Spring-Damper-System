@@ -19,7 +19,8 @@ class FileReader:
     def parseSimData(self, sim_data_path, debug=False) -> pd.DataFrame:
         try:
             parsed_data = pd.read_csv(sim_data_path,
-                                    header=0,
+                                        header=0,
+                                        comment="#",
                                         names=[self.TIME_DATA_HEADER, self.FORCE_DATA_HEADER, self.POSITION_DATA_HEADER, self.VELOCITY_DATA_HEADER],
                                         dtype=float,
                                         skip_blank_lines=True)
@@ -37,11 +38,13 @@ class FileReader:
         
         except FileNotFoundError as e:
             print("\nERROR ENCOUNTERED WHEN PARSING FILE: simulation data file could not be found.")
-            print("Failed to find", sim_data_path, ", check the path or name. Is is in the data/ folder?")
+            print("Failed to find", sim_data_path, ", check the path or name. Is is in the data/ folder?\n")
+            print(e)
             exit(1)
 
         except Exception as e:
-            print("\nERROR OCURRED WHEN OPENING FILE FOR DATA PARSING:")
+            print("\nERROR OCURRED WHEN OPENING FILE FOR DATA PARSING:\n")
+            print(e)
             exit(1)
 
     def collectSimSettings(self):

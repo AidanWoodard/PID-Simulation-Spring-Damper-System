@@ -14,8 +14,6 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 #include "file_conv.hpp"
 #include "sim_config.hpp"
 
-FileConverter::FileConverter() {};
-
 void FileConverter::recordData(double time, double appliedF, double currPos, double currVel) {
     logBuffer.push_back({time, appliedF, currPos, currVel});
 }
@@ -27,10 +25,19 @@ void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
         std::fstream TargetFile;
         if (clearFileBeforeEntry) {
             TargetFile.open(targetFileName, std::ios::out | std::ios::trunc);
+            std::cout << "Clearing file before entry" << '\n';
         } else {
             TargetFile.open(targetFileName, std::ios::out | std::ios::app);
+            std::cout << "Appending to existing file as requested" << '\n';
         }
+
+        TargetFile << std::format("# kp: {} ki: {} kd: {} duration: {}", 
+            AppState::config.kp,
+            AppState::config.ki,
+            AppState::config.kd,
+            fillerDuration) << '\n';
         TargetFile << "Time,Force,Position,Velocity" << '\n';
+
         for (SimDataPoint dataSnapshot : logBuffer) {
             TargetFile << 
                         dataSnapshot.timeStamp << ',' <<
@@ -57,10 +64,22 @@ void FileConverter::displayFinalPosData() {
     std::cout << "----------------------------\n(End of simulation)" << '\n';
 }
 
+void FileConverter::displayFinalVerboseData() {
+    std::cout << "\nSIMULATION OUPUT: Position" << '\n';
+    std::cout << "----------------------------\nTime:\t\tPosition:\t\tVelocity:\t\tApplied Force:" << '\n';
+
+    for (SimDataPoint dataSnapshot : logBuffer) {
+        std::cout << std::format("{:.4f}\t\t{:.4f}\t\t{:.4f}\t\t{:.4f}", 
+                dataSnapshot.timeStamp, dataSnapshot.currPointPos, dataSnapshot.currPointVel, dataSnapshot.currAppliedForce) 
+                        << '\n';
+    }
+
+    std::cout << "----------------------------\n(End of simulation)" << '\n';
+}
+
 void FileConverter::saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs) {
-    if (AppState::config.recordSimDuration) {
+    if (AppState::config.recordSimDuration) {       // FIXME: save the final time
         std::cout << std::format("Simulation duration: {} ns", elapsedTimeNs) << '\n';
         std::cout << std::format("Simulation duration: {:.1f} ms", elapsedTimeMs) << '\n';
-
     }
 }

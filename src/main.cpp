@@ -40,11 +40,7 @@ int main(int argc, char** argv) {
 
     double maxSimulationSeconds = 0.8;      // FIXME: add to sim_config.json
 
-    PIDCalculator pidCalc(AppState::config.kp, 
-                            AppState::config.ki, 
-                            AppState::config.kd);
-    pidCalc.setNewTarget(AppState::config.targetPos);
-
+    PIDCalculator pidCalc;
     PhysicsSim physSim(pidCalc, fileConv);            // references, not copies
 
     physSim.beginSimulation(maxSimulationSeconds);
