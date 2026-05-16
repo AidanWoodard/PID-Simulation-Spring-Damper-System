@@ -5,6 +5,7 @@ a Position vs. Time graph, and initial paramaters of the simulation will be show
 """
 
 import file_reader as fr
+from tools import gen_rand_colors
 import matplotlib.pyplot as plt
 import pandas as pd # type: ignore
 from pathlib import Path
@@ -21,39 +22,62 @@ class DataVisualizer:
 
     """Create all graphs using helper function _generateNewGraph to display new data. Return those graphs"""
     def generateGraphs(self, sim_data_files:list, fig, ax, format:dict) -> tuple:
+        graph_colors:list = gen_rand_colors(len(sim_data_files))
+
         for i, curr_path in enumerate(sim_data_files):
             parsed_sim_data = self.file_reader.parseSimData(curr_path, debug=format["verbose"])
-            fix, ax = self._generateNewGraph(parsed_sim_data, fig, ax, format)
+
+            # show only the first target. They will overlap, and we don't want to fill the legend
+            # with multiple of the same and overlapping target position graphs.
+            fix, ax = self._generateNewGraph(parsed_sim_data, fig, ax, format, 
+                                             graph_color=graph_colors[i],
+                                             graph_title=curr_path.name[:-4], 
+                                             show_targets=(i==0))
 
         if format["show_legend"]: ax.legend()
         return fig, ax
 
     """Generate a new graph on the given axis and figure. Return that new graph"""
-    def _generateNewGraph(self, parsed_sim_data, fig, ax, format:dict) -> tuple:
+    def _generateNewGraph(self, parsed_sim_data, fig, ax, format:dict, graph_color=(0.0, 0.0, 0.0), graph_title="(Missing Title)", show_targets=True) -> tuple:
         # create a graph and show data
         if format["show_pos"]:
             ax.plot(
                     parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
                     parsed_sim_data[self.file_reader.POSITION_DATA_HEADER], 
-                    label=self.file_reader.POSITION_DATA_HEADER)
-            ax.plot(
+                    label=(graph_title + " " + self.file_reader.POSITION_DATA_HEADER),
+                    color=graph_color,
+                    linewidth=1,
+                    marker=".")
+            if show_targets: ax.plot(
                     parsed_sim_data[self.file_reader.TIME_DATA_HEADER],
-                    [10.0] * len(parsed_sim_data[self.file_reader.TIME_DATA_HEADER]),                                 # FIXME: read from .csv header data (to implement)
-                    label="Target Position")            
+                    [10.0] * len(parsed_sim_data[self.file_reader.TIME_DATA_HEADER]),       # FIXME: read 10.0 (target position) from .csv header data (to implement)
+                    label="Target Position",
+                    color=graph_color,                                 
+                    linewidth=1,
+                    linestyle="dashed")            
         if format["show_vel"]: 
             ax.plot(
                     parsed_sim_data[self.file_reader.TIME_DATA_HEADER],
                     parsed_sim_data[self.file_reader.VELOCITY_DATA_HEADER], 
-                    label=self.file_reader.VELOCITY_DATA_HEADER)
-            ax.plot(
+                    label=(graph_title + " " + self.file_reader.VELOCITY_DATA_HEADER),
+                    color=graph_color,
+                    linewidth=1,
+                    marker="x")
+            if show_targets: ax.plot(
                     parsed_sim_data[self.file_reader.TIME_DATA_HEADER],
-                    [0.0] * len(parsed_sim_data[self.file_reader.TIME_DATA_HEADER]),                                 # FIXME: read from .csv header data (to implement)
-                    label="Target Velocity")
+                    [0.0] * len(parsed_sim_data[self.file_reader.TIME_DATA_HEADER]),
+                    color=graph_color,                                 
+                    label="Target Velocity",
+                    linewidth=1,
+                    linestyle="dashed")
         if format["show_applied_force"]:
             ax.plot(
                 parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
                 parsed_sim_data[self.file_reader.FORCE_DATA_HEADER], 
-                label=self.file_reader.FORCE_DATA_HEADER)
+                label=(graph_title + " " + self.file_reader.FORCE_DATA_HEADER),
+                color=graph_color,
+                linewidth=2,
+                linestyle="dotted")
         return fig, ax
 
     """Create initial window with subplots inside of it. Only called once"""
