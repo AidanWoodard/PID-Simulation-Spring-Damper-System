@@ -1,7 +1,8 @@
 {
     "simulation": {
         "gravity_accel": 9.81,
-        "dt": 0.01
+        "dt": 0.01,
+        "max_seconds": 0.8
     },
     "physical_props": {
         "mass_kg": 5,

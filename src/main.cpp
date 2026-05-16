@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     PIDCalculator pidCalc;
     PhysicsSim physSim(pidCalc, fileConv);            // references, not copies
 
-    physSim.beginSimulation(maxSimulationSeconds);
+    physSim.beginSimulation(AppState::config.max_seconds);
     if (verbose) { 
         fileConv.displayFinalPosData();
         std::cout << "(Verbose requested, displayed extra data)" << '\n';

@@ -4,8 +4,9 @@
 #include <json.hpp>
 
 struct SimConfig {
-    double dt;
     double grav_accel;
+    double dt;
+    double max_seconds;
     double mass;
     double startPos;
     double targetPos;
@@ -16,6 +17,7 @@ struct SimConfig {
         SimConfig config;
         config.dt           = json_lib["simulation"].value("dt", 0.01);
         config.grav_accel   = json_lib["simulation"].value("gravity_accel", 9.81);
+        config.max_seconds  = json_lib["simulation"].value("max_seconds", 0.8);
 
         config.mass         = json_lib["physical_props"].value("mass_kg", 5.0);
         config.startPos     = json_lib["physical_props"].value("start_pos", 0.0);
