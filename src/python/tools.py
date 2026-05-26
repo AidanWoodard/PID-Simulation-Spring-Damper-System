@@ -5,6 +5,7 @@ like getting a list of paths for files of a specific extension (.csv/.json).
 
 from pathlib import Path
 from random import uniform
+from matplotlib import cm
 
 def change_extension(filepath:Path, extension:str) -> Path:
     return Path((str(filepath.stem) + extension))
@@ -21,6 +22,7 @@ def get_data_files(user_args, file_extension:str, head_dir:Path) -> list:
         elif data_file[-1] == '/' or data_file == '.':              # add everything in folder
             data_folder_to_search = Path(head_dir / data_file)
             new_data_files = list(file.name for file in data_folder_to_search.glob("*" + file_extension))
+            new_data_files.sort()
             for path in new_data_files: data_file_paths.append(Path(head_dir / data_file / path))
         else:
             print("ERROR: all data files must be of type .csv/.json or a directory with a backslash.")
@@ -31,25 +33,8 @@ def get_data_files(user_args, file_extension:str, head_dir:Path) -> list:
 
 def gen_rand_colors(num_colors:int, min_color=0.3, max_color=1.0) -> list:
     # create a list of random colors in tuple format ranging from (0, 0, 0) to (1, 1, 1)
-    colors = [(0.0, 0.0, 0.0)]
-
     if num_colors <= 0:
         print("WARNING: non-positive number of colors requested to be generated: " + num_colors + " colors requested.\n Returning black...")
-        return colors
-
-    for i in range(num_colors - 1):
-        last_color = colors[-1]
-        new_color_val = uniform(min_color, max_color)
-        if last_color[0] == 0.0:
-            colors.append((new_color_val, 0.0, 1 - new_color_val))
-            print(1)
-        elif last_color[1] == 0.0:
-            colors.append((new_color_val, 1 - new_color_val, 0.0))
-            print(2)
-        elif last_color[2] == 0.0:
-            colors.append((0.0, new_color_val, 1 - new_color_val))
-            print(3)
-        else:
-            colors.append(0.0, 0.0, 0.0)
-
-    return colors
+        return [(0.0, 0.0, 0.0)]
+    
+    return [cm.tab10(i / num_colors) for i in range(num_colors)]
