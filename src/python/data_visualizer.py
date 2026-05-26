@@ -65,27 +65,30 @@ class DataVisualizer:
                 parsed_sim_data[self.file_reader.POSITION_DATA_HEADER], 
                 label=(graph_title + " " + self.file_reader.POSITION_DATA_HEADER),
                 color=graph_color,
-                linewidth=.8,
+                linewidth=1.5,
                 marker=".",
-                markersize=5)          
+                markersize=7,
+                markevery=5)          
         if format["show_vel"]: 
             ax.plot(
                 parsed_sim_data[self.file_reader.TIME_DATA_HEADER],
                 parsed_sim_data[self.file_reader.VELOCITY_DATA_HEADER], 
                 label=(graph_title + " " + self.file_reader.VELOCITY_DATA_HEADER),
                 color=graph_color,
-                linewidth=.8,
+                linewidth=1.5,
                 marker="x",
-                markersize=5)
+                markersize=7,
+                markevery=5)
         if format["show_applied_force"]:
             ax.plot(
                 parsed_sim_data[self.file_reader.TIME_DATA_HEADER], 
                 parsed_sim_data[self.file_reader.FORCE_DATA_HEADER], 
                 label=(graph_title + " " + self.file_reader.FORCE_DATA_HEADER),
                 color=graph_color,
-                linewidth=.8,
-                marker="o",
-                markersize=5)
+                linewidth=1.5,
+                marker="d",
+                markersize=5,
+                markevery=5)
         return fig, ax
 
     """Create initial window with subplots inside of it. Only called once"""

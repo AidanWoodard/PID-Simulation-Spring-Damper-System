@@ -8,7 +8,6 @@ import pandas as pd # pyright: ignore[reportMissingModuleSource]
 
 class FileReader:
     def __init__(self):
-        self.curr_data_file = None
         self.file_line_count : int
         self.BUFFER_LINES_COUNT = 3
         self.POSITION_DATA_HEADER = "Position"
@@ -26,13 +25,17 @@ class FileReader:
                                         skip_blank_lines=True)
             
             if debug:
-                print("\tDEBUG DATA")
-                print("="*10)
-                print(f"Parsing data in {self.curr_data_file}...")
+                header_data:str = "(No header data found)"
+                with open(sim_data_path) as file:
+                    header_data = file.readline(1000)    # 1000 is arbitrary, there will never be this many chars on first line
+
+                print("\n" + "="*15 + "DEBUG DATA" + "="*15)
+                print(f"Parsing data in {str(sim_data_path.name)}:")
+                print(f"PARAMS --{header_data[1:]}")
                 print(f"Columns loaded: {parsed_data.columns.tolist()}")
-                print(f"First 10 rows of data:")
+                print("\nFirst 10 rows of data:")
                 print(parsed_data.head(10))
-                print("="*10)
+                print("="*40)
 
             return parsed_data  
         
