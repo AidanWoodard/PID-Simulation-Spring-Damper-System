@@ -31,13 +31,13 @@ void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
             std::cout << "Appending to existing file as requested" << '\n';
         }
 
-        TargetFile << std::format("# kp: {} ki: {} kd: {} duration: {}", 
+        TargetFile << std::format("# kp: {} ki: {} kd: {} Duration: {} ms", 
             AppState::config.kp,
             AppState::config.ki,
             AppState::config.kd,
-            fillerDuration) << '\n';
-        TargetFile << "Time,Force,Position,Velocity" << '\n';
+            elapsedTimeMs) << '\n';
 
+        TargetFile << "Time,Force,Position,Velocity" << '\n';
         for (SimDataPoint dataSnapshot : logBuffer) {
             TargetFile << 
                         dataSnapshot.timeStamp << ',' <<
@@ -77,9 +77,13 @@ void FileConverter::displayFinalVerboseData() {
     std::cout << "----------------------------\n(End of simulation)" << '\n';
 }
 
-void FileConverter::saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs) {
-    if (AppState::config.recordSimDuration) {       // FIXME: save the final time
-        std::cout << std::format("Simulation duration: {} ns", elapsedTimeNs) << '\n';
-        std::cout << std::format("Simulation duration: {:.1f} ms", elapsedTimeMs) << '\n';
+void FileConverter::saveFinalElapsedTime(double elapsedTimeMs) {
+    if (AppState::config.recordSimDuration) {
+        if (elapsedTimeMs <= 0.0) {
+            std::cout << "WARNING: simulation duration is 0.0ms. Make sure that the calls are in the correct order." << '\n';
+            elapsedTimeMs = 0.0;
+        } else {
+            this->elapsedTimeMs = elapsedTimeMs;
+        }    
     }
 }

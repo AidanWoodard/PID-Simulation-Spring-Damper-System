@@ -72,7 +72,7 @@ def _create_custom_parser() -> ap.ArgumentParser:
                 "maximum number of simulations you can run at one time is 50, but use --exempt to override.\n" \
                 "The -t flag will show the wall time needed to run all configurations simulated.")
 
-    parser.add_argument('-c', '--config', required=True, nargs='+',           help="Run the simulation using a specific config (REQUIRED). Either file names (standard_example.json) or a single directory (weak_pid_examples/)")
+    parser.add_argument('-c', '--config', nargs='+',           help="Run the simulation using a specific config (REQUIRED). Either file names (standard_example.json) or a single directory (weak_pid_examples/)")
     parser.add_argument('-e', '--exempt', action='store_true',                help="Use this flag if you want to ignore max of 50 simulations at one time.")
     parser.add_argument('-v', '--verbose', action='store_true',               help="Run with debug data shown.")
     parser.add_argument('-t', '--showtime', action='store_true',              help="Show final duration of simulation in wall time.")
@@ -84,6 +84,8 @@ if (__name__) == "__main__":
     _check_and_handle_builds()
     parser = _create_custom_parser()
     args = parser.parse_args()
+    configs:Path = []
+    csv_targets:Path = []
 
     if not CSV_FOLDER_PATH.is_dir():
         print("WARNING: Data/ folder not found in project root, creating a new one...")
@@ -96,9 +98,14 @@ if (__name__) == "__main__":
             new_target_folder.mkdir()
         CSV_FOLDER_PATH = new_target_folder
 
-    # find configs and csv target locations
-    configs:Path = get_data_files(args.config, ".json", CONFIG_FOLDER_PATH)
-    csv_targets:Path = _get_target_paths_from_configs(configs, CSV_FOLDER_PATH)
+    # default to directory '.' if no -c or --config
+    if len(args.config) == 0:
+        configs = get_data_files(['.'], ".json", CONFIG_FOLDER_PATH)
+    else:
+        # find configs and csv target locations in format List of Path type
+        configs = get_data_files(args.config, ".json", CONFIG_FOLDER_PATH)
+            
+    csv_targets = _get_target_paths_from_configs(configs, CSV_FOLDER_PATH)
 
     # limit max sims
     if not args.exempt and len(configs) > MAX_SIMULATIONS:

@@ -95,7 +95,7 @@ class DataVisualizer:
     def createWindow(self, format:dict, rows=1, columns=1) -> tuple:
         if not(format["show_pos"] or format["show_vel"] or format["show_applied_force"]):
             print("ERROR ENCOUNTERED WHEN GENERATING GRAPH: No data instructed to display. \
-                  \nDid you forget to set show_pos, etc. to True?")
+                  \nDid you forget to set --showpos (-p), --showvel (-ve), etc. to True?")
             print("(Exiting program...)")
             exit(1)
         

@@ -18,12 +18,12 @@ class FileConverter {
     void clearTargetFile(std::string fileName);
     void displayFinalPosData();
     void displayFinalVerboseData();
-    void saveFinalElapsedTime(double elapsedTimeNs, double elapsedTimeMs);
+    void saveFinalElapsedTime(double elapsedTimeMs);
 
     private:
     std::vector<SimDataPoint> logBuffer;
     std::string targetFileName;
-    int fillerDuration = 5;  // fake simulation duration, unitless
+    double elapsedTimeMs = 0.0;
 };
 
 #endif

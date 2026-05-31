@@ -23,7 +23,7 @@ class PhysicsSim {
     const double GRAV_FORCE = AppState::config.grav_accel * OBJECT_MASS;
     const double FIXED_DT = AppState::config.dt;
 
-    constexpr static double KILL_SWITCH_SIM_TIME = 5.0;   // sim time, not wall time
+    const double KILL_SWITCH_SIM_TIME = AppState::config.sim_dur;   // sim time, not wall time
     constexpr static int TICKS_PER_KILL_SWITCH_CHECK = 200;
 
     PIDCalculator& pid;
@@ -31,12 +31,12 @@ class PhysicsSim {
 
     double calculateAccel(double inputForce);
     void update(double simTime);
-    std::chrono::duration<double> getElapsedTime();
+    std::chrono::duration<double> getElapsedTime(auto startTime);
     
     public:
     PhysicsSim(PIDCalculator& pidRef,
                 FileConverter& fileWriter);
-    void beginSimulation(double maxRuntimeSeconds);
+    void beginSimulation(bool verboseMode = false);
     double getPosition();
     double getVelocity();
 };
