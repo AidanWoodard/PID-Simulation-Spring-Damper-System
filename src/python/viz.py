@@ -38,7 +38,6 @@ def _create_custom_parser() -> ap.ArgumentParser:
                 "'data/' folder. It is highly recommended to specify which .csv files or which folder\n" \
                 "should be displayed. Use --help when running simulations to learn how to create a data folder.")
 
-    parser.add_argument('-d', '--divided', action='store_true',             help=f"Use this flag to display up to {MAX_SIMULATIONS_DIVIDED_DISPLAY} graphs in separate graphs rather than one combined graph.")
     parser.add_argument('-s', '--specify', nargs='+', default=".",          help="List specific .csv files in data/ to display. They have same names as their config.json files.")
     parser.add_argument('-p', '--showpos', action='store_true',             help="Display position data")
     parser.add_argument('-ve', '--showvel', action='store_true',            help="Display velocity data.")

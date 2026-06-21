@@ -5,13 +5,13 @@
 [![Build: CMake](https://img.shields.io/badge/Build-CMake-064F8C.svg)](#getting-started)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A from-scratch PID controller simulation written in C++20, paired with a Python toolkit for running batches of simulations and visualizing the results with matplotlib. Given a target position, gains (`kp`, `ki`, `kd`), and a few physical parameters, the simulator computes how a controlled point mass moves over time and writes the result to CSV for inspection.
+A from-scratch C++20 PID controller simulation with a Python toolkit for running, comparing, and visualizing tunings. Give it a target position, gains (`kp`, `ki`, `kd`), and a few physical parameters — it simulates the response and writes the result to CSV.
 
 ## About
 
-This is my first C++ project, built without AI assistance as a way to learn both modern C++ and the fundamentals of PID control. It started as a personal learning exercise and has grown into something I'm also using as a portfolio piece, so it's written to be buildable and usable by someone other than me.
+My first C++ project, built without AI assistance to learn modern C++ and PID control fundamentals. Started as a personal learning exercise; now doubles as a portfolio piece, so it's written to be usable by someone other than me.
 
-At its core, the simulation answers one question: given a point mass starting at rest at some position, how does a PID controller drive it to a target position over time, and how do different `kp`/`ki`/`kd` gains change that behavior? The C++ side runs the physics and control loop as fast as possible and logs every timestep to CSV; the Python side handles config discovery, batch runs, and plotting, so you can compare many tunings side-by-side without touching C++.
+Core question: given a point mass at rest, how does a PID controller drive it to a target position, and how do `kp`/`ki`/`kd` changes affect that response? C++ handles the physics and control loop; Python handles batch runs and plotting, so tunings can be compared side-by-side without touching C++.
 
 ## Demo / Example Output
 
@@ -22,44 +22,50 @@ At its core, the simulation answers one question: given a point mass starting at
 
 ## Features
 
-- **Config-driven simulations** — define physical properties, PID gains, and simulation timing entirely in JSON, with sensible defaults for anything you omit.
-- **Batch runs** — point `run.py` at a single config, a list of configs, or an entire folder of configs in one command.
-- **CSV telemetry** — every simulation writes a CSV with time, applied force, position, and velocity at each timestep, plus a header comment recording the gains used and the wall-clock run time.
-- **Flexible visualization** — plot position, velocity, and/or applied force independently; overlay multiple runs on one graph or split them into a grid of up to 9 subplots.
-- **Animated plots** — render a run as an animation over a configurable duration instead of a static figure.
-- **Built-in tuning examples** — pre-built config folders demonstrating weak, sharp, and improving PID tunings, plus single-gain comparisons (see [Configuration Reference](#configuration-reference)).
-- **Safety caps with overrides** — both the simulation runner and the visualizer cap batch size by default (50 simulations) to avoid accidentally launching/plotting a huge batch; `--exempt` bypasses this.
-- **Dual kill switches** — every simulation stops either when it reaches its configured simulated duration or when it exceeds a wall-clock time budget, whichever comes first, so a runaway config can't hang the program.
+- **Config-driven** — physical properties, PID gains, and timing all live in JSON, with sensible defaults for anything omitted.
+- **Batch runs** — point `run.py` at one config, several, or a whole folder.
+- **CSV telemetry** — every run logs time, force, position, and velocity per timestep, with gains and duration recorded in the header.
+- **Selective plotting** — overlay position, velocity, and/or applied force for one or many runs on a single combined graph.
+- **Organized comparisons** — `run.py -fo <name>` groups a batch of outputs into `data/<name>/`; `viz.py -s <name>/` then visualizes that whole folder at once.
+- **Built-in tuning examples** — config folders demonstrating weak, sharp, and improving PID tunings, plus single-gain comparisons (see [Configuration Reference](#configuration-reference)).
+- **Safety caps** — both scripts cap batch size at 50 by default; `--exempt` overrides it.
+- **Dual kill switches** — every run stops at its configured simulated duration or a wall-clock time budget, whichever comes first.
 
-## How It Works
+## Architecture
 
-### Physical model
+The project is split into two layers that don't know about each other's internals: a fast C++ simulation core, and a Python layer that orchestrates batches of runs and visualizes them. JSON is the contract going in; CSV is the contract coming out.
 
-The simulation models a single point mass, free to move along one axis, acted on by:
+### Layers
 
-- a constant gravitational force, `F_gravity = mass * gravity_accel`
-- a PID-controlled applied force, recalculated every timestep
+- **C++ core** (`main.cpp`, `phys_sim.cpp`, `PID.cpp`, `file_conv.cpp`) — reads one JSON config, runs the physics + PID loop as fast as possible, writes one CSV. No concept of batching, comparisons, or plotting.
+- **JSON config** — the human-editable contract between you and the C++ core (see [Configuration Reference](#configuration-reference)).
+- **Python layer** (`run.py`, `viz.py`) — owns everything about *many* simulations: discovering configs, running them in batch, organizing outputs, and plotting. None of this logic touches the C++ side.
 
-Net acceleration is computed as:
-
-```
-a = (F_applied - F_gravity) / mass
-```
-
-and integrated forward with simple Euler steps each timestep `dt`:
+### Data flow
 
 ```
+config/*.json → run.py → build/new_test <config> <csv> <verbose> → data/*.csv → viz.py → matplotlib figure
+```
+
+`run.py` resolves config names/folders to paths, builds the executable if needed, and shells out to it once per config. `viz.py` independently resolves CSV names/folders to paths and plots them — it never touches the simulation, so you can replot existing data without rerunning anything.
+
+### The run.py / viz.py split — and why it matters
+
+`run.py`'s `-fo/--folder <name>` groups a batch of outputs into `data/<name>/`. `viz.py`'s `-s/--specify` then accepts either individual CSV filenames or that same folder name to visualize the whole batch at once. The simulation core and config files never need to know how their outputs get organized or compared — that's a Python-layer concern only. Adding a new way to group or compare runs touches `run.py`/`viz.py` and nothing in C++.
+
+### Physics & control loop
+
+A single point mass moves under gravity and a PID-controlled applied force:
+
+```
+a = (F_applied - F_gravity) / mass        # F_gravity = mass * gravity_accel
 velocity += a * dt
 position += velocity * dt
 ```
 
-(`src/phys_sim.cpp`)
+(`phys_sim.cpp`, simple Euler integration.) Despite the repo name, there's no spring or damper term yet — see [Known Issues / Roadmap](#known-issues--roadmap).
 
-> **Note:** despite the repository name, the current physics model does **not** implement spring or damper forces — there's no position- or velocity-proportional restoring force beyond what the PID controller itself applies. The model today is gravity + point mass + PID force only. Spring-damper dynamics are a planned addition — see [Known Issues / Roadmap](#known-issues--roadmap).
-
-### PID controller
-
-`PIDCalculator` (`include/PID.hpp`, `src/PID.cpp`) computes the applied force each timestep as:
+Each tick, `PIDCalculator` (`PID.hpp`/`PID.cpp`) computes:
 
 ```
 error      = target_pos - position
@@ -67,26 +73,11 @@ sumError  += error * dt
 force      = kp * error + ki * sumError - kd * velocity
 ```
 
-The derivative term acts directly on velocity (rather than on the derivative of the error) and serves as a braking force. There is currently no anti-windup or output clamping on the integral term.
+The derivative term brakes against velocity directly; there's no anti-windup on `sumError`.
 
-### Simulation loop
+`main.cpp` wires one run together: load config → construct `PIDCalculator` + `PhysicsSim` → loop (compute force → integrate → record) until either `simulated_duration` or `max_seconds` (wall-clock, checked every ~200 ticks) is hit → write the CSV.
 
-`main.cpp` ties everything together for a single run:
-
-1. Load and parse the JSON config file (path given as `argv[1]`) into a `SimConfig`.
-2. Construct a `PIDCalculator` (loads gains + target from the config) and a `PhysicsSim`.
-3. Run the simulation loop (`PhysicsSim::beginSimulation`), which on every tick:
-   - asks the PID controller for the current applied force,
-   - integrates velocity and position,
-   - records a data point.
-4. The loop stops on whichever happens first:
-   - **simulated time** reaches `simulated_duration`, or
-   - **wall-clock time** exceeds `max_seconds` (checked roughly every 200 ticks).
-5. Write all recorded data points to the CSV path given as `argv[2]`.
-
-### Simulation output format
-
-Each run produces one CSV file shaped like this:
+### Output format
 
 ```
 # kp: 50 ki: 7 kd: 30 Duration: 12.3456 ms
@@ -96,44 +87,7 @@ Time,Force,Position,Velocity
 ...
 ```
 
-- Line 1 is a comment recording the gains used and (if `record_sim_duration` is enabled) the wall-clock duration of the run, in milliseconds.
-- Line 2 is the column header.
-- Every subsequent line is one simulation timestep.
-
-## Project Structure
-
-```
-pid_proj/
-├── CMakeLists.txt        # C++20 build config; produces build/new_test
-├── LICENSE
-├── README.md
-├── include/               # C++ headers
-│   ├── PID.hpp
-│   ├── phys_sim.hpp
-│   ├── file_conv.hpp
-│   └── sim_config.hpp
-├── src/
-│   ├── main.cpp           # Entry point: loads config, runs sim, writes CSV
-│   ├── PID.cpp
-│   ├── phys_sim.cpp
-│   ├── file_conv.cpp
-│   └── python/             # CLI + visualization tooling
-│       ├── run.py          # Runs the C++ simulation from JSON configs
-│       ├── viz.py          # Visualizes resulting CSVs with matplotlib
-│       ├── data_visualizer.py
-│       ├── file_reader.py
-│       └── tools.py
-├── external/
-│   └── json.hpp            # nlohmann/json v3.11.2 (header-only)
-├── config/                 # JSON simulation configs
-│   ├── min_config.json
-│   ├── std_config.json
-│   ├── compare_pids/
-│   ├── improving_pids/
-│   ├── sharp_pids/
-│   └── weak_pids/
-└── data/                   # Generated CSV output (git-ignored)
-```
+Line 1 is a comment with the gains used and (if `record_sim_duration` is set) the wall-clock duration in ms; line 2 is the column header; every line after is one timestep.
 
 ## Getting Started
 
@@ -157,7 +111,7 @@ cmake -B build -S .
 cmake --build build
 ```
 
-This produces the `new_test` executable in `build/`. You generally won't invoke it directly — `run.py` builds it automatically if `build/` doesn't exist yet, and handles passing it the right paths.
+Produces `build/new_test`. You won't usually invoke it directly — `run.py` auto-builds it if missing.
 
 ### First run
 
@@ -166,11 +120,11 @@ python src/python/run.py -c std_config.json
 python src/python/viz.py -s std_config.csv -p -ve -af
 ```
 
-The first command runs the simulation defined in `config/std_config.json` and writes `data/std_config.csv`. The second opens a matplotlib window plotting position, velocity, and applied force from that CSV.
+The first runs `config/std_config.json` and writes `data/std_config.csv`; the second plots position, velocity, and force from it.
 
 ## Configuration Reference
 
-Every config is a JSON file with four optional top-level sections. Any field you omit falls back to the default below.
+Each config is JSON with four optional top-level sections; omitted fields fall back to the defaults below.
 
 | Section | Field | Type | Default | Description |
 |---|---|---|---|---|
@@ -186,7 +140,7 @@ Every config is a JSON file with four optional top-level sections. Any field you
 | `pid_gains` | `kd` | float | `0.0` | Derivative gain |
 | `data_handling` | `record_sim_duration` | bool | `true` | Whether to record the wall-clock run time in the CSV header |
 
-`config/min_config.json` shows the minimum viable config — it only sets PID gains and relies on defaults for everything else:
+`config/min_config.json` — the minimum viable config, relying on defaults for everything but gains:
 
 ```json
 {
@@ -271,25 +225,21 @@ python src/python/viz.py [OPTIONS]
 
 | Flag | Alias | Type | Default | Description |
 |---|---|---|---|---|
-| `--specify` | `-s` | str (one or more) | all `.csv` in `data/` | CSV file name(s) or a folder (relative to `data/`) to visualize |
-| `--divided` | `-d` | flag | `False` | Show each file in its own subplot (up to 9) instead of one combined graph |
+| `--specify` | `-s` | str (one or more) | all `.csv` in `data/` | CSV file name(s), or a single folder name — typically one created by `run.py`'s `-fo` (e.g. `-s weak/` after `run.py -fo weak`) |
 | `--showpos` | `-p` | flag | `False` | Plot position |
 | `--showvel` | `-ve` | flag | `False` | Plot velocity |
 | `--showappliedforce` | `-af` | flag | `False` | Plot applied force |
 | `--nolegend` | `-nl` | flag | `False` | Hide the legend |
 | `--exempt` | `-e` | flag | `False` | Bypass the 50-simulation combined-graph cap |
-| `--animated <ms>` | — | int | `0` | Animate the plot over the given duration, in milliseconds |
+| `--animated <ms>` | — | int | `0` | Accepted but not yet wired to actual animation rendering (see [Known Issues](#known-issues--roadmap)) |
 | `--verbose` | `-v` | flag | `False` | Print debug info while parsing CSVs |
 
 ```bash
 # Visualize a single result, showing all three traces
 python src/python/viz.py -s std_config.csv -p -ve -af
 
-# Compare every config in two tuning folders, one subplot per file
-python src/python/viz.py -s weak_pids/ sharp_pids/ -d -p
-
-# Animate a single run over 4 seconds
-python src/python/viz.py -s std_config.csv -p --animated 4000
+# Visualize an entire folder of results produced by `run.py -fo weak`
+python src/python/viz.py -s weak/ -p
 ```
 
 ## Example Workflow
@@ -303,18 +253,19 @@ python src/python/viz.py -s std_config.csv -p --animated 4000
    ```bash
    python src/python/viz.py -s my_config.csv -p -ve -af
    ```
-4. **Compare tunings.** Run a whole folder of configs and view them together:
+4. **Compare tunings.** Group a batch into a named folder, then visualize it as one combined graph:
    ```bash
-   python src/python/run.py -c weak_pids/ sharp_pids/
-   python src/python/viz.py -s weak_pids/ sharp_pids/ -d -p
+   python src/python/run.py -c weak_pids/ sharp_pids/ -fo compare
+   python src/python/viz.py -s compare/ -p
    ```
 
 ## Known Issues / Roadmap
 
-- **No spring-damper dynamics yet.** The repository name reflects the original goal of modeling a spring-damper system, but the implemented physics is currently gravity + point mass + PID force only. Adding actual spring (position-proportional) and damper (velocity-proportional) forces to `phys_sim.cpp` is the main planned extension.
-- **No integral anti-windup.** `sumError` in `PIDCalculator` accumulates without any clamping, so heavily saturated or long-running configs can experience integral windup.
-- **Config key typo (fixed).** Earlier versions of every config file (except `min_config.json`) used the key `target_post` instead of `target_pos`, which `sim_config.hpp` actually reads — meaning the configured target position was silently ignored in favor of the 10.0 default. This has been corrected in all config files in this repository; if you're working from an older clone or a copied config, double-check the key name.
-- **`--showtime` prints the wrong line.** `run.py`'s `-t/--showtime` flag intends to show each run's duration, but it currently skips the CSV's comment header (which contains the duration) and prints the column-title line instead. See the `FIXME` in `run.py`.
+- **No spring-damper dynamics yet.** Despite the repo name, the physics is gravity + point mass + PID force only. Adding real spring/damper forces to `phys_sim.cpp` is the main planned extension.
+- **No integral anti-windup.** `sumError` accumulates unclamped, so saturated or long-running configs can wind up.
+- **`--animated` is a no-op.** `viz.py` accepts `--animated <ms>`, but `setAnimationTime()` is never called and no animation is actually rendered yet.
+- **Config key typo (fixed).** Configs used to use `target_post` instead of the `target_pos` key `sim_config.hpp` reads, silently ignoring the configured target. Fixed in this repo; double-check the key if you're on an older clone.
+- **`--showtime` prints the wrong line.** `run.py -t` skips the CSV's comment header (which has the duration) and prints the column-title line instead. See the `FIXME` in `run.py`.
 
 ## License
 

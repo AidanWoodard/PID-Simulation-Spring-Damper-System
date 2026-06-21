@@ -14,7 +14,7 @@ class DataVisualizer:
     def __init__(self, file_reader:fr, animated=False, show_legend=True):
         self.file_reader = file_reader
         self.PLOT_TITLE = "1-Dimension PID Simulated Control"
-        self.ANIMATED = animated
+        self.ANIMATED = animated    # not yet implemented but CLI flag is available
         if animated: 
             self.animation_length_ms : int
             self.MAX_ANIM_LENGTH_MS = 10*1000   # 10 seconds
