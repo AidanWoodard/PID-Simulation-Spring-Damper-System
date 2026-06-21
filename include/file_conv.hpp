@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <chrono>
 #include "phys_sim.hpp"
 #include "sim_config.hpp"
 
@@ -18,7 +19,7 @@ class FileConverter {
     void clearTargetFile(std::string fileName);
     void displayFinalPosData();
     void displayFinalVerboseData();
-    void saveFinalElapsedTime(double elapsedTimeMs);
+    void saveFinalElapsedTime(std::chrono::duration<double> elapsedWallTime);
 
     private:
     std::vector<SimDataPoint> logBuffer;

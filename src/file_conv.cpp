@@ -10,6 +10,7 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 #include <iostream>
 #include <string>
 #include <format>
+#include <chrono>
 #include <fstream>
 #include "file_conv.hpp"
 #include "sim_config.hpp"
@@ -31,7 +32,7 @@ void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
             std::cout << "Appending to existing file as requested" << '\n';
         }
 
-        TargetFile << std::format("# kp: {} ki: {} kd: {} Duration: {} ms", 
+        TargetFile << std::format("# kp: {} ki: {} kd: {} Duration: {:.4f} ms", 
             AppState::config.kp,
             AppState::config.ki,
             AppState::config.kd,
@@ -74,16 +75,21 @@ void FileConverter::displayFinalVerboseData() {
                         << '\n';
     }
 
-    std::cout << "----------------------------\n(End of simulation)" << '\n';
+    std::cout << std::format("----------------------------\nDuration: {:.4f} ms\n(End of simulation)", elapsedTimeMs) << '\n';
 }
 
-void FileConverter::saveFinalElapsedTime(double elapsedTimeMs) {
+void FileConverter::saveFinalElapsedTime(std::chrono::duration<double> elapsedWallTime) {
+    // convert elapsedWallTime into a more usable double representation in milliseconds
+    // create a double_ms so that when we call .count() we don't get a seconds representation
+    using double_ms = std::chrono::duration<double, std::milli>;
+    double elapsedWallTimeMs = std::chrono::duration_cast<double_ms>(elapsedWallTime).count();
+
     if (AppState::config.recordSimDuration) {
-        if (elapsedTimeMs <= 0.0) {
+        if (elapsedWallTimeMs <= 0.0) {
             std::cout << "WARNING: simulation duration is 0.0ms. Make sure that the calls are in the correct order." << '\n';
             elapsedTimeMs = 0.0;
         } else {
-            this->elapsedTimeMs = elapsedTimeMs;
+            elapsedTimeMs = elapsedWallTimeMs;
         }    
     }
 }

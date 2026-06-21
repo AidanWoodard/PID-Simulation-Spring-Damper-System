@@ -1,0 +1,13 @@
+{
+    "simulation": {
+    },
+    "physical_props": {
+    },
+    "pid_gains": {
+        "kp": 50.0,
+        "ki": 7.0,
+        "kd": 30.0
+    },
+    "data_handling": {
+    }
+}

@@ -56,7 +56,7 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
             const std::chrono::duration<double> elapsedWallTime(getElapsedTime(startWallTime));
 
             // save final time to fileWriter, to be used to write to .csv
-            fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
+            fileWriter.saveFinalElapsedTime(elapsedWallTime);
             simActive = false;
             if (verboseMode) { std::cout << "DEBUG: kill switch activated by simulated time." << '\n'; }
         }
@@ -75,7 +75,7 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
                 }
 
                 // fileWrite stores this final time for .csv writing of final data
-                fileWriter.saveFinalElapsedTime(std::chrono::duration_cast<std::chrono::milliseconds>(elapsedWallTime).count());
+                fileWriter.saveFinalElapsedTime(elapsedWallTime);
             } else {
                 std::cout << std::format("Simulation not finished at {}, restarting counter...", elapsedWallTime) << '\n';
                 checkIfExceededDur = TICKS_PER_KILL_SWITCH_CHECK;
@@ -86,7 +86,8 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
     fileWriter.saveSimDataToCSV();
 
     std::cout << "#############################################" << '\n';
-    std::cout << "\tSimulation finished" << '\n';
+    std::cout << "\tSimulation finished"<< '\n';
+    if (verboseMode) { std::cout << std::setprecision(4) << "Duration: " << getElapsedTime(startWallTime) << " ms" << '\n'; }   // FIXME: not a double or ms
     std::cout << "#############################################" << '\n';
 }
 

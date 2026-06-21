@@ -99,7 +99,7 @@ if (__name__) == "__main__":
         CSV_FOLDER_PATH = new_target_folder
 
     # default to directory '.' if no -c or --config
-    if len(args.config) == 0:
+    if not args.config:
         configs = get_data_files(['.'], ".json", CONFIG_FOLDER_PATH)
     else:
         # find configs and csv target locations in format List of Path type
