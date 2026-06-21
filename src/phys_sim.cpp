@@ -57,12 +57,12 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
             const std::chrono::duration<double> elapsedWallTime(getElapsedTime(startWallTime));
             
             // save final time to fileWriter, to be used to write to .csv
-            std::cout << "OTHER FINAL ELAPSED TIME" << elapsedWallTime.count() << '\n';
+            std::cout << "\nFINAL ELAPSED TIME, SECONDS: " << elapsedWallTime.count() << '\n' << '\n';
             finalSimDurSec = elapsedWallTime.count();
             fileWriter.saveFinalElapsedTime(elapsedWallTime);
             
             simActive = false;
-            if (verboseMode) { std::cout << "DEBUG: kill switch activated by simulated time." << '\n'; }
+            if (verboseMode) { std::cout << "[DEBUG] kill switch activated by SIMULATED TIME." << '\n'; }
         }
 
         // wall clock kill switch. check that our periodic counter is at zero (or ignore if sim stopped)
@@ -74,12 +74,12 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
             if (elapsedWallTime > std::chrono::duration<double>(AppState::config.max_seconds)) {
                 simActive = false;
                 if (verboseMode) {
-                    std::cout << "DEBUG: kill switch activated by wall time." << '\n';
+                    std::cout << "[DEBUG] kill switch activated by WALL TIME." << '\n';
                     std::cout << std::format("Exiting simulation at {:.6f} elapsed time", getElapsedTime(startWallTime).count()) << '\n';
                 }
 
                 // fileWrite stores this final time for .csv writing of final data
-                std::cout << "FINAL ELAPSED TIME, SECONDS: " << elapsedWallTime.count() << '\n';
+                std::cout << "\nFINAL ELAPSED TIME, SECONDS: " << elapsedWallTime.count() << '\n' << '\n';
                 finalSimDurSec = elapsedWallTime.count();
                 fileWriter.saveFinalElapsedTime(elapsedWallTime);
             } else {
@@ -88,8 +88,10 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
             }
         } else { checkIfExceededDur--; }
     }
-
-    fileWriter.saveSimDataToCSV();
+    // Default for first arg is always true, rewrite the target file, don't append .csv data.
+    // This could be a potential addition in the future with additional CLI flags in run.py's
+    // argument reader, allowing user to add to an existing data file.
+    fileWriter.saveSimDataToCSV(true, verboseMode);
 
     std::cout << "#############################################" << '\n';
     std::cout << "\tSimulation finished"<< '\n';

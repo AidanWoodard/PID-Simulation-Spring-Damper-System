@@ -14,7 +14,7 @@ class FileConverter {
                     double appliedF,
                     double currPos,
                     double currVel);
-    void saveSimDataToCSV(bool clearFileBeforeEntry = true);
+    void saveSimDataToCSV(bool clearFileBeforeEntry, bool verbose);
     void setTargetFile(std::string fileName);
     void clearTargetFile(std::string fileName);
     void displayFinalPosData();

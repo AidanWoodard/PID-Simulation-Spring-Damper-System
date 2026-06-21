@@ -75,7 +75,6 @@ def _create_custom_parser() -> ap.ArgumentParser:
     parser.add_argument('-c', '--config', nargs='+',           help="Run the simulation using a specific config (REQUIRED). Either file names (standard_example.json) or a single directory (weak_pid_examples/)")
     parser.add_argument('-e', '--exempt', action='store_true',                help="Use this flag if you want to ignore max of 50 simulations at one time.")
     parser.add_argument('-v', '--verbose', action='store_true',               help="Run with debug data shown.")
-    parser.add_argument('-t', '--showtime', action='store_true',              help="Show final duration of simulation in wall time.")
     parser.add_argument('-fo', '--folder', type=str, default='',              help="Store all simulation data in a folder of given name (--folder <new_name>).")
 
     return parser
@@ -119,10 +118,3 @@ if (__name__) == "__main__":
                             str(CSV_FOLDER_PATH / csv_targets[i]),
                             str(args.verbose)], check=True)
     
-    # display final times after all have finished (in case of verbose mode)
-    if args.showtime:
-        for target in enumerate(csv_targets):
-            with open(target[1]) as f:
-                f.readline()            # FIXME: read headers properly, this just skips first line (titles)
-                print(f.readline())     # (first line of data, fix later to display time)
-

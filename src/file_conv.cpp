@@ -20,17 +20,17 @@ void FileConverter::recordData(double time, double appliedF, double currPos, dou
     logBuffer.push_back({time, appliedF, currPos, currVel});
 }
 
-void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
+void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry, bool verbose) {
     if (targetFileName == "") {
         std::cerr << "ERROR: No target file for data named. Did you forget to call FileConverter.setTargetFile('file.csv')?" << '\n';
     } else {
         std::fstream TargetFile;
         if (clearFileBeforeEntry) {
             TargetFile.open(targetFileName, std::ios::out | std::ios::trunc);
-            std::cout << "Clearing file before entry" << '\n';
+            if (verbose) { std::cout << "[Debug] Clearing file before entry" << '\n'; }
         } else {
             TargetFile.open(targetFileName, std::ios::out | std::ios::app);
-            std::cout << "Appending to existing file as requested" << '\n';
+            if (verbose) { std::cout << "[Debug] Appending to existing file as requested" << '\n'; }
         }
 
         // Write the header information of the file using global values read from .json config file
