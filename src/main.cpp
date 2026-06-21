@@ -38,10 +38,8 @@ int main(int argc, char** argv) {
     FileConverter fileConv;
     fileConv.setTargetFile(csv_target_path);
 
-    double maxSimulationSeconds = 0.8;      // FIXME: add to sim_config.json
-
     PIDCalculator pidCalc;
-    PhysicsSim physSim(pidCalc, fileConv);            // references, not copies
+    PhysicsSim physSim(pidCalc, fileConv);
 
     physSim.beginSimulation(verbose);
     if (verbose) { 

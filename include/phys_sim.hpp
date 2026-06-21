@@ -25,6 +25,7 @@ class PhysicsSim {
 
     const double KILL_SWITCH_SIM_TIME = AppState::config.sim_dur;   // sim time, not wall time
     constexpr static int TICKS_PER_KILL_SWITCH_CHECK = 200;
+    double finalSimDurSec = 0.0;
 
     PIDCalculator& pid;
     FileConverter& fileWriter;

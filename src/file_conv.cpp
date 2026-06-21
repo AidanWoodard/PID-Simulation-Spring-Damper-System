@@ -12,6 +12,7 @@ Telemetry.csv is written to in the following format (spaces for clairity):
 #include <format>
 #include <chrono>
 #include <fstream>
+
 #include "file_conv.hpp"
 #include "sim_config.hpp"
 
@@ -32,12 +33,15 @@ void FileConverter::saveSimDataToCSV(bool clearFileBeforeEntry) {
             std::cout << "Appending to existing file as requested" << '\n';
         }
 
+        // Write the header information of the file using global values read from .json config file
         TargetFile << std::format("# kp: {} ki: {} kd: {} Duration: {:.4f} ms", 
             AppState::config.kp,
             AppState::config.ki,
             AppState::config.kd,
             elapsedTimeMs) << '\n';
 
+        // Headers and all sim data in order. Use standard .csv formatting of labled columns and linebreaks
+        // only at distinct time or unit intervals. More readable and easier for Python tools
         TargetFile << "Time,Force,Position,Velocity" << '\n';
         for (SimDataPoint dataSnapshot : logBuffer) {
             TargetFile << 
@@ -58,6 +62,7 @@ void FileConverter::displayFinalPosData() {
     std::cout << "\nSIMULATION OUPUT: Position" << '\n';
     std::cout << "----------------------------\nTime:\t\tPosition:" << '\n';
 
+    // Debug info for simulation position data only
     for (SimDataPoint dataSnapshot : logBuffer) {
         std::cout << std::format("{:.4f}\t\t{:.4f}", dataSnapshot.timeStamp, dataSnapshot.currPointPos) << '\n';
     }
@@ -69,6 +74,7 @@ void FileConverter::displayFinalVerboseData() {
     std::cout << "\nSIMULATION OUPUT: Position" << '\n';
     std::cout << "----------------------------\nTime:\t\tPosition:\t\tVelocity:\t\tApplied Force:" << '\n';
 
+    // Display the entirety of the buffer when requested (debug feature)
     for (SimDataPoint dataSnapshot : logBuffer) {
         std::cout << std::format("{:.4f}\t\t{:.4f}\t\t{:.4f}\t\t{:.4f}", 
                 dataSnapshot.timeStamp, dataSnapshot.currPointPos, dataSnapshot.currPointVel, dataSnapshot.currAppliedForce) 

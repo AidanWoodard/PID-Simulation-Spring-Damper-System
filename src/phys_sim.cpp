@@ -8,6 +8,7 @@ point B with an applied weight (constant).
 #include <thread>
 #include <format>
 #include <fstream>
+
 #include "phys_sim.hpp"
 #include "PID.hpp"
 #include "file_conv.hpp"
@@ -17,7 +18,7 @@ PhysicsSim::PhysicsSim(PIDCalculator& pidRef, FileConverter& fileRef)
             : pid(pidRef), 
             fileWriter(fileRef) {}
 
-double PhysicsSim::calculateAccel(double inputForce) {\
+double PhysicsSim::calculateAccel(double inputForce) {
     // F = MA   ->   A = F/M
     return (inputForce - GRAV_FORCE) / OBJECT_MASS;
 }
@@ -54,9 +55,12 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
         if (simTime >= AppState::config.sim_dur) {
             // calc our wall time currently, save to var 'elapsedWallTime'. Use this for killswitch checks
             const std::chrono::duration<double> elapsedWallTime(getElapsedTime(startWallTime));
-
+            
             // save final time to fileWriter, to be used to write to .csv
+            std::cout << "OTHER FINAL ELAPSED TIME" << elapsedWallTime.count() << '\n';
+            finalSimDurSec = elapsedWallTime.count();
             fileWriter.saveFinalElapsedTime(elapsedWallTime);
+            
             simActive = false;
             if (verboseMode) { std::cout << "DEBUG: kill switch activated by simulated time." << '\n'; }
         }
@@ -69,12 +73,14 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
             // in the json config file. this prevents infinite loops or excessive sim times
             if (elapsedWallTime > std::chrono::duration<double>(AppState::config.max_seconds)) {
                 simActive = false;
-                if (verboseMode) { 
+                if (verboseMode) {
                     std::cout << "DEBUG: kill switch activated by wall time." << '\n';
-                    std::cout << std::format("Exiting simulation at {:.6f} elapsed time", std::chrono::duration<double>(AppState::config.max_seconds).count()) << '\n';
+                    std::cout << std::format("Exiting simulation at {:.6f} elapsed time", getElapsedTime(startWallTime).count()) << '\n';
                 }
 
                 // fileWrite stores this final time for .csv writing of final data
+                std::cout << "FINAL ELAPSED TIME, SECONDS: " << elapsedWallTime.count() << '\n';
+                finalSimDurSec = elapsedWallTime.count();
                 fileWriter.saveFinalElapsedTime(elapsedWallTime);
             } else {
                 std::cout << std::format("Simulation not finished at {}, restarting counter...", elapsedWallTime) << '\n';
@@ -87,7 +93,7 @@ void PhysicsSim::beginSimulation(bool verboseMode) {
 
     std::cout << "#############################################" << '\n';
     std::cout << "\tSimulation finished"<< '\n';
-    if (verboseMode) { std::cout << std::setprecision(4) << "Duration: " << getElapsedTime(startWallTime) << " ms" << '\n'; }   // FIXME: not a double or ms
+    if (verboseMode) { std::cout << std::setprecision(4) << "Duration: " << finalSimDurSec << " sec" << '\n'; }
     std::cout << "#############################################" << '\n';
 }
 

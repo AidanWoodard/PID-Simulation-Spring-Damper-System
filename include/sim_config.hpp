@@ -29,6 +29,8 @@ struct SimConfig {
         config.ki           = json_lib["pid_gains"].value("ki", 0.0);
         config.kd           = json_lib["pid_gains"].value("kd", 0.0);
     
+        config.recordSimDuration = json_lib["data_handling"].value("record_sim_duration", true);
+
         return config;
     };
 };
