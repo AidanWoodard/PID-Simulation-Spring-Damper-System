@@ -7,7 +7,7 @@
     "physical_props": {
         "mass_kg": 5,
         "start_pos": 0.0,
-        "target_post": 10.0
+        "target_pos": 10.0
     },
     "pid_gains": {
         "kp": 200.0,
